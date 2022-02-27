@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    "jest",
+    "node"
+  ],
+  "extends": [
+    "plugin:jest/recommended",
+    "plugin:node/recommended"
+  ]
+}
