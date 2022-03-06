@@ -62,13 +62,13 @@ private:
     Napi::Array arr_b = info[1].As<Napi::Array>();
 
     if (arr_a.Length() != dim_) {
-      Napi::Error::New(env, "wrong length of first array (given " + std::to_string(arr_a.Length()) + ", expected " +
+      Napi::Error::New(env, "invalid first array length (given " + std::to_string(arr_a.Length()) + ", expected " +
                               std::to_string(dim_) + ")")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (arr_b.Length() != dim_) {
-      Napi::Error::New(env, "wrong length of second array (given " + std::to_string(arr_b.Length()) + ", expected " +
+      Napi::Error::New(env, "invalid second array length (given " + std::to_string(arr_b.Length()) + ", expected " +
                               std::to_string(dim_) + ")")
         .ThrowAsJavaScriptException();
       return env.Null();
@@ -149,13 +149,13 @@ private:
     Napi::Array arr_b = info[1].As<Napi::Array>();
 
     if (arr_a.Length() != dim_) {
-      Napi::Error::New(env, "wrong length of first array (given " + std::to_string(arr_a.Length()) + ", expected " +
+      Napi::Error::New(env, "invalid first array length (given " + std::to_string(arr_a.Length()) + ", expected " +
                               std::to_string(dim_) + ")")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (arr_b.Length() != dim_) {
-      Napi::Error::New(env, "wrong length of second array (given " + std::to_string(arr_b.Length()) + ", expected " +
+      Napi::Error::New(env, "invalid second array length (given " + std::to_string(arr_b.Length()) + ", expected " +
                               std::to_string(dim_) + ")")
         .ThrowAsJavaScriptException();
       return env.Null();

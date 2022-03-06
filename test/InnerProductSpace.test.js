@@ -28,8 +28,8 @@ describe('InnerProductSpace', () => {
     });
 
     it('throws an error if given an array with a length different from the number of dimensions', () => {
-      expect(() => { space.distance([0, 1, 2, 3], [3, 4, 5]) }).toThrowError('wrong length of first array (given 4, expected 3)');
-      expect(() => { space.distance([0, 1, 2], [3, 4, 5, 6]) }).toThrowError('wrong length of second array (given 4, expected 3)');
+      expect(() => { space.distance([0, 1, 2, 3], [3, 4, 5]) }).toThrowError('invalid first array length (given 4, expected 3)');
+      expect(() => { space.distance([0, 1, 2], [3, 4, 5, 6]) }).toThrowError('invalid second array length (given 4, expected 3)');
     });
 
     it('calculates one minus inner product between two arrays', () => {
