@@ -30,8 +30,12 @@ public:
   }
 
   static Napi::Object Init(Napi::Env env, Napi::Object exports) {
-    Napi::Function func =
-      DefineClass(env, "L2Space", {InstanceMethod("distance", &L2Space::distance), InstanceMethod("dim", &L2Space::dim)});
+    // clang-format off
+    Napi::Function func = DefineClass(env, "L2Space", {
+      InstanceMethod("distance", &L2Space::distance),
+      InstanceMethod("dim", &L2Space::dim)
+    });
+    // clang-format on
 
     Napi::FunctionReference* constructor = new Napi::FunctionReference();
     *constructor = Napi::Persistent(func);
@@ -116,9 +120,12 @@ public:
   }
 
   static Napi::Object Init(Napi::Env env, Napi::Object exports) {
-    Napi::Function func =
-      DefineClass(env, "InnerProductSpace",
-                  {InstanceMethod("distance", &InnerProductSpace::distance), InstanceMethod("dim", &InnerProductSpace::dim)});
+    // clang-format off
+    Napi::Function func = DefineClass(env, "InnerProductSpace", {
+      InstanceMethod("distance", &InnerProductSpace::distance),
+      InstanceMethod("dim", &InnerProductSpace::dim)
+    });
+    // clang-format on
 
     Napi::FunctionReference* constructor = new Napi::FunctionReference();
     *constructor = Napi::Persistent(func);
@@ -228,10 +235,8 @@ public:
   }
 
   ~BruteforceSearch() {
-    if (space_)
-      delete space_;
-    if (index_)
-      delete index_;
+    if (space_) delete space_;
+    if (index_) delete index_;
   }
 
   static Napi::Object Init(Napi::Env env, Napi::Object exports) {
@@ -272,8 +277,7 @@ private:
 
     max_elements_ = info[0].As<Napi::Number>().Uint32Value();
 
-    if (index_)
-      delete index_;
+    if (index_) delete index_;
 
     try {
       index_ = new hnswlib::BruteforceSearch<float>(space_, static_cast<size_t>(max_elements_));
@@ -301,8 +305,7 @@ private:
 
     const std::string filename = info[0].As<Napi::String>().ToString();
 
-    if (index_->data_)
-      free(index_->data_);
+    if (index_->data_) free(index_->data_);
 
     try {
       index_->loadIndex(filename, space_);
@@ -474,15 +477,13 @@ private:
 
   Napi::Value maxElements(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    if (index_ == nullptr)
-      return Napi::Number::New(env, 0);
+    if (index_ == nullptr) return Napi::Number::New(env, 0);
     return Napi::Number::New(env, index_->maxelements_);
   }
 
   Napi::Value currentCount(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    if (index_ == nullptr)
-      return Napi::Number::New(env, 0);
+    if (index_ == nullptr) return Napi::Number::New(env, 0);
     return Napi::Number::New(env, index_->cur_element_count);
   }
 };
