@@ -5,7 +5,7 @@
 
 #include <napi.h>
 
-#include "hnswlib.h"
+#include "hnswlib/hnswlib.h"
 
 class L2Space : public Napi::ObjectWrap<L2Space> {
 public:
