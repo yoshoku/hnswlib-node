@@ -1,4 +1,4 @@
-const { L2Space } = require('../index');
+const { L2Space } = require('../lib');
 
 describe('L2Space', () => {
   it('throws an error if no arguments are given', () => {

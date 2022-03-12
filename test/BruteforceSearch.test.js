@@ -1,4 +1,4 @@
-const { BruteforceSearch } = require('../index');
+const { BruteforceSearch } = require('../lib');
 
 describe('BruteforceSearch', () => {
   describe('#constructor', () => {

@@ -1,4 +1,4 @@
-const { InnerProductSpace } = require('../index');
+const { InnerProductSpace } = require('../lib');
 
 describe('InnerProductSpace', () => {
   it('throws an error if no arguments are given', () => {

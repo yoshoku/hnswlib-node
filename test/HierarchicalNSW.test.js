@@ -1,4 +1,4 @@
-const { HierarchicalNSW } = require('../index');
+const { HierarchicalNSW } = require('../lib');
 
 describe('HierarchicalNSW', () => {
   describe('#constructor', () => {
