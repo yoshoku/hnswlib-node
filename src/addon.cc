@@ -16,12 +16,12 @@ public:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return;
     }
     if (!info[0].IsNumber()) {
-      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
       return;
     }
 
@@ -50,16 +50,16 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 2) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected Array").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsArray()) {
-      Napi::TypeError::New(env, "wrong second argument type, expected Array").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the second argument type, must be an Array.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -67,14 +67,14 @@ private:
     Napi::Array arr_b = info[1].As<Napi::Array>();
 
     if (arr_a.Length() != dim_) {
-      Napi::Error::New(env, "invalid first array length (given " + std::to_string(arr_a.Length()) + ", expected " +
-                              std::to_string(dim_) + ")")
+      Napi::Error::New(env, "Invalid the first array length (expected " + std::to_string(dim_) + ", but got " +
+                              std::to_string(arr_a.Length()) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (arr_b.Length() != dim_) {
-      Napi::Error::New(env, "invalid second array length (given " + std::to_string(arr_b.Length()) + ", expected " +
-                              std::to_string(dim_) + ")")
+      Napi::Error::New(env, "Invalid the second array length (expected " + std::to_string(dim_) + ", but got " +
+                              std::to_string(arr_b.Length()) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -106,12 +106,12 @@ public:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return;
     }
     if (!info[0].IsNumber()) {
-      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
       return;
     }
 
@@ -140,16 +140,16 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 2) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected Array").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsArray()) {
-      Napi::TypeError::New(env, "wrong second argument type, expected Array").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the second argument type, must be an Array.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -157,14 +157,14 @@ private:
     Napi::Array arr_b = info[1].As<Napi::Array>();
 
     if (arr_a.Length() != dim_) {
-      Napi::Error::New(env, "invalid first array length (given " + std::to_string(arr_a.Length()) + ", expected " +
-                              std::to_string(dim_) + ")")
+      Napi::Error::New(env, "Invalid the first array length (expected " + std::to_string(dim_) + ", but got " +
+                              std::to_string(arr_a.Length()) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (arr_b.Length() != dim_) {
-      Napi::Error::New(env, "invalid second array length (given " + std::to_string(arr_b.Length()) + ", expected " +
-                              std::to_string(dim_) + ")")
+      Napi::Error::New(env, "Invalid the second array length (expected " + std::to_string(dim_) + ", but got " +
+                              std::to_string(arr_b.Length()) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -199,22 +199,22 @@ public:
     Napi::Env env = info.Env();
 
     if (info.Length() != 2) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return;
     }
     if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected String").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
       return;
     }
     if (!info[1].IsNumber()) {
-      Napi::TypeError::New(env, "wrong second argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
       return;
     }
 
     const std::string space_name = info[0].As<Napi::String>().ToString();
     if (space_name != "l2" && space_name != "ip") {
-      Napi::Error::New(env, "wrong space name, expected \"l2\" or \"ip\"").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Wrong space name, expected \"l2\" or \"ip\".").ThrowAsJavaScriptException();
       return;
     }
 
@@ -266,12 +266,12 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsNumber()) {
-      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -294,12 +294,12 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected String").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -321,12 +321,12 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected String").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -341,28 +341,28 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 2) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected Array").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsNumber()) {
-      Napi::TypeError::New(env, "wrong second argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     if (index_ == nullptr) {
-      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     Napi::Array arr = info[0].As<Napi::Array>();
     if (arr.Length() != dim_) {
-      Napi::Error::New(env, "invalid array length (given " + std::to_string(arr.Length()) + ", expected " +
-                              std::to_string(dim_) + ")")
+      Napi::Error::New(env, "Invalid the given array length (expected " + std::to_string(dim_) + ", but got " +
+                              std::to_string(arr.Length()) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -389,17 +389,17 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsNumber()) {
-      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     if (index_ == nullptr) {
-      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -413,42 +413,43 @@ private:
   Napi::Value searchKnn(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
-    if (index_ == nullptr) {
-      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
     if (info.Length() != 2) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected Array").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsNumber()) {
-      Napi::TypeError::New(env, "wrong second argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     Napi::Array arr = info[0].As<Napi::Array>();
     if (arr.Length() != dim_) {
-      Napi::Error::New(env, "invalid array length (given " + std::to_string(arr.Length()) + ", expected " +
-                              std::to_string(dim_) + ")")
+      Napi::Error::New(env, "Invalid the given array length (expected " + std::to_string(dim_) + ", but got " +
+                              std::to_string(arr.Length()) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
 
     const uint32_t k = info[1].As<Napi::Number>().Uint32Value();
     if (k > max_elements_) {
-      Napi::Error::New(env, "invalid number of k-nearest neighbors (cannot be given a value greater than `maxElements`: " +
-                              std::to_string(max_elements_) + ")")
+      Napi::Error::New(env, "Invalid the number of k-nearest neighbors (cannot be given a value greater than `maxElements`: " +
+                              std::to_string(max_elements_) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (k <= 0) {
-      Napi::Error::New(env, "invalid number of k-nearest neighbors (must be a positive number)").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Invalid the number of k-nearest neighbors (must be a positive number).")
+        .ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -498,22 +499,22 @@ public:
     Napi::Env env = info.Env();
 
     if (info.Length() != 2) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return;
     }
     if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected String").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
       return;
     }
     if (!info[1].IsNumber()) {
-      Napi::TypeError::New(env, "wrong second argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
       return;
     }
 
     const std::string space_name = info[0].As<Napi::String>().ToString();
     if (space_name != "l2" && space_name != "ip") {
-      Napi::Error::New(env, "wrong space name, expected \"l2\" or \"ip\"").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Wrong space name, expected \"l2\" or \"ip\".").ThrowAsJavaScriptException();
       return;
     }
 
@@ -568,24 +569,24 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() < 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1..4)")
+      Napi::Error::New(env, "Expected 1-4 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsNumber()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsUndefined() && !info[1].IsNumber()) {
-      Napi::TypeError::New(env, "wrong sencond argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the sencond argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[2].IsUndefined() && !info[2].IsNumber()) {
-      Napi::TypeError::New(env, "wrong third argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the third argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[3].IsUndefined() && !info[3].IsNumber()) {
-      Napi::TypeError::New(env, "wrong fourth argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the fourth argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -612,12 +613,12 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected String").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -642,12 +643,12 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected String").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -662,17 +663,17 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsNumber()) {
-      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     if (index_ == nullptr) {
-      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -695,28 +696,28 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 2) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected Array").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsNumber()) {
-      Napi::TypeError::New(env, "wrong second argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     if (index_ == nullptr) {
-      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     Napi::Array arr = info[0].As<Napi::Array>();
     if (arr.Length() != dim_) {
-      Napi::Error::New(env, "invalid array length (given " + std::to_string(arr.Length()) + ", expected " +
-                              std::to_string(dim_) + ")")
+      Napi::Error::New(env, "Invalid the given array length (expected " + std::to_string(dim_) + ", but got " +
+                              std::to_string(arr.Length()) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -743,17 +744,17 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsNumber()) {
-      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     if (index_ == nullptr) {
-      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -773,17 +774,17 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsNumber()) {
-      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     if (index_ == nullptr) {
-      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -802,37 +803,37 @@ private:
   Napi::Value searchKnn(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
-    if (index_ == nullptr) {
-      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
     if (info.Length() != 2) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "wrong first argument type, expected Array").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsNumber()) {
-      Napi::TypeError::New(env, "wrong second argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     Napi::Array arr = info[0].As<Napi::Array>();
     if (arr.Length() != dim_) {
-      Napi::Error::New(env, "invalid array length (given " + std::to_string(arr.Length()) + ", expected " +
-                              std::to_string(dim_) + ")")
+      Napi::Error::New(env, "Invalid the given array length (expected " + std::to_string(dim_) + ", but got " +
+                              std::to_string(arr.Length()) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
 
     const uint32_t k = info[1].As<Napi::Number>().Uint32Value();
     if (k > index_->max_elements_) {
-      Napi::Error::New(env, "invalid number of k-nearest neighbors (cannot be given a value greater than `maxElements`: " +
-                              std::to_string(index_->max_elements_) + ")")
+      Napi::Error::New(env, "Invalid the number of k-nearest neighbors (cannot be given a value greater than `maxElements`: " +
+                              std::to_string(index_->max_elements_) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -888,7 +889,7 @@ private:
   Napi::Value getEf(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (index_ == nullptr) {
-      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
     }
     return Napi::Number::New(env, index_->ef_);
@@ -898,17 +899,17 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
-      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[0].IsNumber()) {
-      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
     if (index_ == nullptr) {
-      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
