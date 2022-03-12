@@ -488,10 +488,442 @@ private:
   }
 };
 
+class HierarchicalNSW : public Napi::ObjectWrap<HierarchicalNSW> {
+public:
+  uint32_t dim_;
+  hnswlib::HierarchicalNSW<float>* index_;
+  hnswlib::SpaceInterface<float>* space_;
+
+  HierarchicalNSW(const Napi::CallbackInfo& info) : Napi::ObjectWrap<HierarchicalNSW>(info), index_(nullptr), space_(nullptr) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 2) {
+      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+        .ThrowAsJavaScriptException();
+      return;
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "wrong first argument type, expected String").ThrowAsJavaScriptException();
+      return;
+    }
+    if (!info[1].IsNumber()) {
+      Napi::TypeError::New(env, "wrong second argument type, expected Number").ThrowAsJavaScriptException();
+      return;
+    }
+
+    const std::string space_name = info[0].As<Napi::String>().ToString();
+    if (space_name != "l2" && space_name != "ip") {
+      Napi::Error::New(env, "wrong space name, expected \"l2\" or \"ip\"").ThrowAsJavaScriptException();
+      return;
+    }
+
+    dim_ = info[1].As<Napi::Number>().Uint32Value();
+
+    try {
+      if (space_name == "l2") {
+        space_ = new hnswlib::L2Space(static_cast<size_t>(dim_));
+      } else {
+        space_ = new hnswlib::InnerProductSpace(static_cast<size_t>(dim_));
+      }
+    } catch (const std::bad_alloc& err) {
+      Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
+      return;
+    }
+  }
+
+  ~HierarchicalNSW() {
+    if (space_) delete space_;
+    if (index_) delete index_;
+  }
+
+  static Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    // clang-format off
+    Napi::Function func = DefineClass(env, "HierarchicalNSW", {
+      InstanceMethod("initIndex", &HierarchicalNSW::initIndex),
+      InstanceMethod("loadIndex", &HierarchicalNSW::loadIndex),
+      InstanceMethod("saveIndex", &HierarchicalNSW::saveIndex),
+      InstanceMethod("resizeIndex", &HierarchicalNSW::resizeIndex),
+      InstanceMethod("addPoint", &HierarchicalNSW::addPoint),
+      InstanceMethod("markDelete", &HierarchicalNSW::markDelete),
+      InstanceMethod("unmarkDelete", &HierarchicalNSW::unmarkDelete),
+      InstanceMethod("searchKnn", &HierarchicalNSW::searchKnn),
+      InstanceMethod("getIdsList", &HierarchicalNSW::getIdsList),
+      InstanceMethod("getMaxElements", &HierarchicalNSW::getMaxElements),
+      InstanceMethod("getCurrentCount", &HierarchicalNSW::getCurrentCount),
+      InstanceMethod("getEf", &HierarchicalNSW::getEf),
+      InstanceMethod("setEf", &HierarchicalNSW::setEf)
+    });
+    // clang-format on
+
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    env.SetInstanceData<Napi::FunctionReference>(constructor);
+
+    exports.Set("HierarchicalNSW", func);
+    return exports;
+  }
+
+private:
+  Napi::Value initIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() < 1) {
+      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1..4)")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsNumber()) {
+      Napi::TypeError::New(env, "wrong first argument type, expected Number").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[1].IsUndefined() && !info[1].IsNumber()) {
+      Napi::TypeError::New(env, "wrong sencond argument type, expected Number").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[2].IsUndefined() && !info[2].IsNumber()) {
+      Napi::TypeError::New(env, "wrong third argument type, expected Number").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[3].IsUndefined() && !info[3].IsNumber()) {
+      Napi::TypeError::New(env, "wrong fourth argument type, expected Number").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const uint32_t max_elements_ = info[0].As<Napi::Number>().Uint32Value();
+    const uint32_t m_ = info[1].IsUndefined() ? 16 : info[1].As<Napi::Number>().Uint32Value();
+    const uint32_t ef_construction_ = info[2].IsUndefined() ? 200 : info[2].As<Napi::Number>().Uint32Value();
+    const uint32_t random_seed_ = info[3].IsUndefined() ? 100 : info[3].As<Napi::Number>().Uint32Value();
+
+    if (index_) delete index_;
+
+    try {
+      index_ = new hnswlib::HierarchicalNSW<float>(space_, static_cast<size_t>(max_elements_), static_cast<size_t>(m_),
+                                                   static_cast<size_t>(ef_construction_), static_cast<size_t>(random_seed_));
+    } catch (const std::bad_alloc& err) {
+      index_ = nullptr;
+      Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    return env.Null();
+  }
+
+  Napi::Value loadIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "wrong first argument type, expected String").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const std::string filename = info[0].As<Napi::String>().ToString();
+
+    if (index_) delete index_;
+
+    try {
+      index_ = new hnswlib::HierarchicalNSW<float>(space_, filename, false);
+    } catch (const std::runtime_error& e) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    } catch (const std::bad_alloc& err) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(err.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    return env.Null();
+  }
+
+  Napi::Value saveIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "wrong first argument type, expected String").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const std::string filename = info[0].As<Napi::String>().ToString();
+
+    index_->saveIndex(filename);
+
+    return env.Null();
+  }
+
+  Napi::Value resizeIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsNumber()) {
+      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const uint32_t new_max_elements = info[0].As<Napi::Number>().Uint32Value();
+
+    try {
+      index_->resizeIndex(static_cast<size_t>(new_max_elements));
+    } catch (const std::runtime_error& e) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    } catch (const std::bad_alloc& err) {
+      Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    return env.Null();
+  }
+
+  Napi::Value addPoint(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 2) {
+      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsArray()) {
+      Napi::TypeError::New(env, "wrong first argument type, expected Array").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[1].IsNumber()) {
+      Napi::TypeError::New(env, "wrong second argument type, expected Number").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    Napi::Array arr = info[0].As<Napi::Array>();
+    if (arr.Length() != dim_) {
+      Napi::Error::New(env, "invalid array length (given " + std::to_string(arr.Length()) + ", expected " +
+                              std::to_string(dim_) + ")")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    std::vector<float> vec(dim_, 0.0);
+    for (uint32_t i = 0; i < dim_; i++) {
+      Napi::Value val = arr[i];
+      vec[i] = val.As<Napi::Number>().FloatValue();
+    }
+
+    const uint32_t idx = info[1].As<Napi::Number>().Uint32Value();
+
+    try {
+      index_->addPoint(reinterpret_cast<void*>(vec.data()), static_cast<hnswlib::labeltype>(idx));
+    } catch (const std::runtime_error& e) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    return env.Null();
+  }
+
+  Napi::Value markDelete(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsNumber()) {
+      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const uint32_t idx = info[0].As<Napi::Number>().Uint32Value();
+
+    try {
+      index_->markDelete(static_cast<hnswlib::labeltype>(idx));
+    } catch (const std::runtime_error& e) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    return env.Null();
+  }
+
+  Napi::Value unmarkDelete(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsNumber()) {
+      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const uint32_t idx = info[0].As<Napi::Number>().Uint32Value();
+
+    try {
+      index_->unmarkDelete(static_cast<hnswlib::labeltype>(idx));
+    } catch (const std::runtime_error& e) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    return env.Null();
+  }
+
+  Napi::Value searchKnn(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    if (info.Length() != 2) {
+      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 2)")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsArray()) {
+      Napi::TypeError::New(env, "wrong first argument type, expected Array").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[1].IsNumber()) {
+      Napi::TypeError::New(env, "wrong second argument type, expected Number").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    Napi::Array arr = info[0].As<Napi::Array>();
+    if (arr.Length() != dim_) {
+      Napi::Error::New(env, "invalid array length (given " + std::to_string(arr.Length()) + ", expected " +
+                              std::to_string(dim_) + ")")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const uint32_t k = info[1].As<Napi::Number>().Uint32Value();
+    if (k > index_->max_elements_) {
+      Napi::Error::New(env, "invalid number of k-nearest neighbors (cannot be given a value greater than `maxElements`: " +
+                              std::to_string(index_->max_elements_) + ")")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    std::vector<float> vec(dim_, 0.0);
+    for (uint32_t i = 0; i < dim_; i++) {
+      Napi::Value val = arr[i];
+      vec[i] = val.As<Napi::Number>().FloatValue();
+    }
+    std::priority_queue<std::pair<float, size_t>> knn =
+      index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k));
+    const size_t n_results = knn.size();
+    Napi::Array arr_distances = Napi::Array::New(env, n_results);
+    Napi::Array arr_neighbors = Napi::Array::New(env, n_results);
+    for (int32_t i = static_cast<int32_t>(n_results) - 1; i >= 0; i--) {
+      const std::pair<float, size_t>& nn = knn.top();
+      arr_distances[i] = Napi::Number::New(env, nn.first);
+      arr_neighbors[i] = Napi::Number::New(env, nn.second);
+      knn.pop();
+    }
+
+    Napi::Object results = Napi::Object::New(env);
+    results.Set("distances", arr_distances);
+    results.Set("neighbors", arr_neighbors);
+    return results;
+  }
+
+  Napi::Value getIdsList(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (index_ == nullptr) return Napi::Array::New(env, 0);
+    uint32_t n_elements = index_->label_lookup_.size();
+    Napi::Array ids = Napi::Array::New(env, n_elements);
+    uint32_t counter = 0;
+    for (auto kv : index_->label_lookup_) {
+      ids[counter] = Napi::Number::New(env, kv.first);
+      counter++;
+    }
+    return ids;
+  }
+
+  Napi::Value getMaxElements(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (index_ == nullptr) return Napi::Number::New(env, 0);
+    return Napi::Number::New(env, index_->max_elements_);
+  }
+
+  Napi::Value getCurrentCount(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (index_ == nullptr) return Napi::Number::New(env, 0);
+    return Napi::Number::New(env, index_->cur_element_count);
+  }
+
+  Napi::Value getEf(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    return Napi::Number::New(env, index_->ef_);
+  }
+
+  Napi::Value setEf(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "wrong number of arguments (given " + std::to_string(info.Length()) + ", expected 1)")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsNumber()) {
+      Napi::TypeError::New(env, "wrong argument type, expected Number").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "search index has not been initialized, call `initIndex` in advance").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const uint32_t ef = info[0].As<Napi::Number>().Uint32Value();
+    index_->setEf(static_cast<size_t>(ef));
+
+    return env.Null();
+  }
+};
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   L2Space::Init(env, exports);
   InnerProductSpace::Init(env, exports);
   BruteforceSearch::Init(env, exports);
+  HierarchicalNSW::Init(env, exports);
   return exports;
 }
 
