@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Node.js bindings for Hnswlib",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "repository": "https://github.com/yoshoku/hnswlib-node",
   "author": "Atsushi Tatsuma",
   "license": "Apache-2.0",
