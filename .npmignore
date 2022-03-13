@@ -1,0 +1,9 @@
+.npmignore
+.clang-format
+.eslintrc.json
+.gitignore
+.github/
+.husky/
+node_modules/
+build/
+commitlint.config.js
