@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "repository": "https://github.com/yoshoku/hnswlib-node",
+  "homepage": "https://github.com/yoshoku/hnswlib-node",
   "author": "Atsushi Tatsuma",
   "license": "Apache-2.0",
   "keywords": [
