@@ -1,5 +1,5 @@
 {
-  "name": "hnswlib",
+  "name": "hnswlib-node",
   "version": "1.0.0",
   "description": "Node.js bindings for Hnswlib",
   "main": "lib/index.js",
