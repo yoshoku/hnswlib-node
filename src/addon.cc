@@ -249,7 +249,8 @@ public:
       InstanceMethod("removePoint", &BruteforceSearch::removePoint),
       InstanceMethod("searchKnn", &BruteforceSearch::searchKnn),
       InstanceMethod("getMaxElements", &BruteforceSearch::getMaxElements),
-      InstanceMethod("getCurrentCount", &BruteforceSearch::getCurrentCount)
+      InstanceMethod("getCurrentCount", &BruteforceSearch::getCurrentCount),
+      InstanceMethod("getNumDimensions", &BruteforceSearch::getNumDimensions)
     });
     // clang-format on
 
@@ -487,6 +488,8 @@ private:
     if (index_ == nullptr) return Napi::Number::New(env, 0);
     return Napi::Number::New(env, index_->cur_element_count);
   }
+
+  Napi::Value getNumDimensions(const Napi::CallbackInfo& info) { return Napi::Number::New(info.Env(), dim_); }
 };
 
 class HierarchicalNSW : public Napi::ObjectWrap<HierarchicalNSW> {
@@ -551,6 +554,7 @@ public:
       InstanceMethod("getIdsList", &HierarchicalNSW::getIdsList),
       InstanceMethod("getMaxElements", &HierarchicalNSW::getMaxElements),
       InstanceMethod("getCurrentCount", &HierarchicalNSW::getCurrentCount),
+      InstanceMethod("getNumDimensions", &HierarchicalNSW::getNumDimensions),
       InstanceMethod("getEf", &HierarchicalNSW::getEf),
       InstanceMethod("setEf", &HierarchicalNSW::setEf)
     });
@@ -885,6 +889,8 @@ private:
     if (index_ == nullptr) return Napi::Number::New(env, 0);
     return Napi::Number::New(env, index_->cur_element_count);
   }
+
+  Napi::Value getNumDimensions(const Napi::CallbackInfo& info) { return Napi::Number::New(info.Env(), dim_); }
 
   Napi::Value getEf(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();

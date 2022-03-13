@@ -100,6 +100,14 @@ describe('HierarchicalNSW', () => {
     });
   });
 
+  describe('#getNumDimensions', () => {
+    const index = new HierarchicalNSW('l2', 3);
+
+    it('returns number of dimensions', () => {
+      expect(index.getNumDimensions()).toBe(3);
+    });
+  });
+
   describe('#getEf', () => {
     const index = new HierarchicalNSW('l2', 3);
 

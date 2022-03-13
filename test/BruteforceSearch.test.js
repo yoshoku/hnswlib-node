@@ -59,6 +59,14 @@ describe('BruteforceSearch', () => {
     });
   });
 
+  describe('#getNumDimensions', () => {
+    const index = new BruteforceSearch('l2', 3);
+
+    it('returns number of dimensions', () => {
+      expect(index.getNumDimensions()).toBe(3);
+    });
+  });
+
   describe('#addPoint', () => {
     const index = new BruteforceSearch('l2', 3);
 
