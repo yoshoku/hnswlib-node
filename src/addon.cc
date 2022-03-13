@@ -33,7 +33,7 @@ public:
     // clang-format off
     Napi::Function func = DefineClass(env, "L2Space", {
       InstanceMethod("distance", &L2Space::distance),
-      InstanceMethod("dim", &L2Space::dim)
+      InstanceMethod("getNumDimensions", &L2Space::getNumDimensions)
     });
     // clang-format on
 
@@ -94,7 +94,7 @@ private:
     return Napi::Number::New(info.Env(), d);
   }
 
-  Napi::Value dim(const Napi::CallbackInfo& info) { return Napi::Number::New(info.Env(), dim_); }
+  Napi::Value getNumDimensions(const Napi::CallbackInfo& info) { return Napi::Number::New(info.Env(), dim_); }
 };
 
 class InnerProductSpace : public Napi::ObjectWrap<InnerProductSpace> {
@@ -123,7 +123,7 @@ public:
     // clang-format off
     Napi::Function func = DefineClass(env, "InnerProductSpace", {
       InstanceMethod("distance", &InnerProductSpace::distance),
-      InstanceMethod("dim", &InnerProductSpace::dim)
+      InstanceMethod("getNumDimensions", &InnerProductSpace::getNumDimensions)
     });
     // clang-format on
 
@@ -184,7 +184,7 @@ private:
     return Napi::Number::New(info.Env(), d);
   }
 
-  Napi::Value dim(const Napi::CallbackInfo& info) { return Napi::Number::New(info.Env(), dim_); }
+  Napi::Value getNumDimensions(const Napi::CallbackInfo& info) { return Napi::Number::New(info.Env(), dim_); }
 };
 
 class BruteforceSearch : public Napi::ObjectWrap<BruteforceSearch> {

@@ -11,9 +11,9 @@ describe('L2Space', () => {
 
   const space = new L2Space(3);
 
-  describe('#dim', () => {
+  describe('#getNumDimensions', () => {
     it('returns number of dimensions', () => {
-      expect(space.dim()).toBe(3);
+      expect(space.getNumDimensions()).toBe(3);
     });
   });
 
