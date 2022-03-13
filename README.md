@@ -1,5 +1,6 @@
 # hnswlib-node
 
+[![npm version](https://badge.fury.io/js/hnswlib-node.svg)](https://badge.fury.io/js/hnswlib-node)
 [![Build Status](https://github.com/yoshoku/hnswlib-node/actions/workflows/build.yml/badge.svg)](https://github.com/yoshoku/hnswlib-node/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://github.com/yoshoku/hnswlib-node/blob/main/LICENSE.txt)
 
