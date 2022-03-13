@@ -7,6 +7,11 @@
   "repository": "https://github.com/yoshoku/hnswlib-node",
   "author": "Atsushi Tatsuma",
   "license": "Apache-2.0",
+  "keywords": [
+    "hnswlib",
+    "approximate nearest neighbor search",
+    "machine learning"
+  ],
   "gypfile": true,
   "scripts": {
     "prepare": "husky install",
