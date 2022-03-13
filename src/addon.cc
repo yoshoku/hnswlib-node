@@ -248,8 +248,8 @@ public:
       InstanceMethod("addPoint", &BruteforceSearch::addPoint),
       InstanceMethod("removePoint", &BruteforceSearch::removePoint),
       InstanceMethod("searchKnn", &BruteforceSearch::searchKnn),
-      InstanceMethod("maxElements", &BruteforceSearch::maxElements),
-      InstanceMethod("currentCount", &BruteforceSearch::currentCount)
+      InstanceMethod("getMaxElements", &BruteforceSearch::getMaxElements),
+      InstanceMethod("getCurrentCount", &BruteforceSearch::getCurrentCount)
     });
     // clang-format on
 
@@ -476,13 +476,13 @@ private:
     return results;
   }
 
-  Napi::Value maxElements(const Napi::CallbackInfo& info) {
+  Napi::Value getMaxElements(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (index_ == nullptr) return Napi::Number::New(env, 0);
     return Napi::Number::New(env, index_->maxelements_);
   }
 
-  Napi::Value currentCount(const Napi::CallbackInfo& info) {
+  Napi::Value getCurrentCount(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (index_ == nullptr) return Napi::Number::New(env, 0);
     return Napi::Number::New(env, index_->cur_element_count);

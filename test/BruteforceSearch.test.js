@@ -31,31 +31,31 @@ describe('BruteforceSearch', () => {
     });
   });
 
-  describe('#maxElements', () => {
+  describe('#getMaxElements', () => {
     const index = new BruteforceSearch('l2', 3);
 
     it('returns 0 if called before the index is initialized', () => {
-      expect(index.maxElements()).toBe(0);
+      expect(index.getMaxElements()).toBe(0);
     });
 
     it('returns maximum number of elements', () => {
       index.initIndex(10);
-      expect(index.maxElements()).toBe(10);
+      expect(index.getMaxElements()).toBe(10);
     });
   });
 
-  describe('#currentCount', () => {
+  describe('#getCurrentCount', () => {
     const index = new BruteforceSearch('l2', 3);
 
     it('returns 0 if called before the index is initialized', () => {
-      expect(index.currentCount()).toBe(0);
+      expect(index.getCurrentCount()).toBe(0);
     });
 
     it('returns current number of elements', () => {
       index.initIndex(5);
       index.addPoint([1, 2, 3], 0);
       index.addPoint([2, 3, 4], 1);
-      expect(index.currentCount()).toBe(2);
+      expect(index.getCurrentCount()).toBe(2);
     });
   });
 
@@ -109,9 +109,9 @@ describe('BruteforceSearch', () => {
       index.initIndex(2);
       index.addPoint([1, 2, 3], 0);
       index.addPoint([1, 2, 4], 1);
-      expect(index.currentCount()).toBe(2);
+      expect(index.getCurrentCount()).toBe(2);
       index.removePoint(1);
-      expect(index.currentCount()).toBe(1);
+      expect(index.getCurrentCount()).toBe(1);
       expect(index.searchKnn([1, 2, 4], 1).neighbors).toEqual([0]);
     });
   });
