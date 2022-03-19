@@ -3,6 +3,7 @@
 [![npm version](https://badge.fury.io/js/hnswlib-node.svg)](https://badge.fury.io/js/hnswlib-node)
 [![Build Status](https://github.com/yoshoku/hnswlib-node/actions/workflows/build.yml/badge.svg)](https://github.com/yoshoku/hnswlib-node/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://github.com/yoshoku/hnswlib-node/blob/main/LICENSE.txt)
+[![Documentation](http://img.shields.io/badge/api-reference-blue.svg)](https://yoshoku.github.io/hnswlib-node/doc/)
 
 hnswlib-node provides Node.js bindings for [Hnswlib](https://github.com/nmslib/hnswlib)
 that implements approximate nearest-neghbor search based on
