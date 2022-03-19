@@ -16,52 +16,235 @@
  * limitations under the License.
  */
 
+/** @packageDocumentation */
+
+/** Distance for search index. `l2`: sum((x_i - y_i)^2), `ip`: 1 - sum(x_i * y_i). */
 export type SpaceName = 'l2' | 'ip';
 
+/** Searh result object. */
 export interface SearchResult {
+  /** The disances of the nearest negihbors found. */
   distances: Array<number>,
+  /** The indices of the nearest neighbors found. */
   neighbors: Array<number>
 }
 
+/**
+ * L2 space object.
+ * @param {number} numDimensions The dimensionality of space.
+ */
 export class L2Space {
   constructor(numDimensions: number);
+  /**
+   * calculates the squared Euclidean distance between two data points.
+   * @param {number[]} pointA The data point vector.
+   * @param {number[]} pointB The data point vector.
+   * @return {number} The distance between data points.
+   */
   distance(pointA: Array<number>, pointB: Array<number>): number;
+  /**
+   * returns the dimensionality of space.
+   * @return {number} The dimensionality of space.
+   */
   getNumDimensions(): number;
 }
 
+/**
+ * Inner product space object.
+ * @param {number} numDimensions The dimensionality of space.
+ */
 export class InnerProductSpace {
   constructor(numDimensions: number);
+  /**
+   * calculates the one minus inner product between two data points.
+   * @param {number[]} pointA The data point vector.
+   * @param {number[]} pointB The data point vector.
+   * @return {number} The distance between data points.
+   */
   distance(pointA: Array<number>, pointB: Array<number>): number;
+  /**
+   * returns the dimensionality of space.
+   * @return {number} The dimensionality of space.
+   */
   getNumDimensions(): number;
 }
 
+/**
+ * Nearest-neighbor search index object based on brute-force search.
+ *
+ * ```typescript
+ * const numDimensions = 5;
+ * const maxElements = 1000;
+ *
+ * index = new BruteforceSearch('l2', numDimensions);
+ * index.initIndex(maxElements);
+ *
+ * index.addPoint([0, 1, 2, 3, 4], 0);
+ * index.addPoint([1, 2, 3, 4, 5], 1);
+ * index.addPoint([3, 4, 5, 6, 6], 2);
+ *
+ * const numNeighbors = 3;
+ * const result = index.searchKnn([1, 4, 2, 3, 4], numNeighbors);
+ *
+ * console.table(result);
+ * ```
+ */
 export class BruteforceSearch {
+  /**
+   * @param {SpaceName} spaceName The metric space to create for the index ('l2' or 'ip').
+   * @param {number} numDimensions The dimensionality of data points.
+   */
   constructor(spaceName: SpaceName, numDimensions: number);
+  /**
+   * initializes search index.
+   * @param {number} maxElements The maximum number of data points.
+   */
   initIndex(maxElements: number): void;
+  /**
+   * loads the search index.
+   * @param {string} filename The filename to read from.
+   */
   loadIndex(filename: string): void;
+  /**
+   * saves the search index.
+   * @param {string} filename The filename to save to.
+   */
   saveIndex(filename: string): void;
+  /**
+   * adds a datum point to the search index.
+   * @param {number[]} point The datum point to be added to the search index.
+   * @param {number} label The index of the datum point to be added.
+   */
   addPoint(point: Array<number>, label: number): void;
+  /**
+   * removes the datum point from the search index.
+   * @param {number} label The index of the datum point to be removed.
+   */
   removePoint(label: number): void;
+  /**
+   * returns `numNeighbors` closest items for a given query point.
+   * @param {number[]} queryPoint The query point vector.
+   * @param {number} numNeighbors The number of nearest neighbors to search for.
+   * @return {SearchResult} The search result object consists of distances and indices of the nearest neighbors found.
+   */
   searchKnn(queryPoint: Array<number>, numNeighbors: number): SearchResult;
+  /**
+   * returns the maximum number of data points that can be indexed.
+   * @return {numbers} The maximum number of data points that can be indexed.
+   */
   getMaxElements(): number;
+  /**
+   * returns the number of data points currently indexed.
+   * @return {numbers} The number of data points currently indexed.
+   */
   getCurrentCount(): number;
+  /**
+   * returns the dimensionality of data points.
+   * @return {number} The dimensionality of data points.
+   */
   getNumDimensions(): number;
 }
 
+/**
+ * Approximate nearest-neighbor search index object based on Hierarchical navigable small world graphs.
+ *
+ * ```typescript
+ * const numDimensions = 5;
+ * const maxElements = 1000;
+ *
+ * index = new HierarchicalNSW('l2', numDimensions);
+ * index.initIndex(maxElements, 16, 200, 100);
+ *
+ * index.addPoint([0, 1, 2, 3, 4], 0);
+ * index.addPoint([1, 2, 3, 4, 5], 1);
+ * index.addPoint([3, 4, 5, 6, 6], 2);
+ *
+ * const numNeighbors = 3;
+ * const result = index.searchKnn([1, 4, 2, 3, 4], numNeighbors);
+ *
+ * console.table(result);
+ * ```
+ */
 export class HierarchicalNSW {
+  /**
+   * @param {SpaceName} spaceName The metric space to create for the index ('l2' or 'ip').
+   * @param {number} numDimensions The dimesionality of metric space.
+   */
   constructor(spaceName: SpaceName, numDimensions: number);
+  /**
+   * Initialize index.
+   * @param {number} maxElements The maximum number of elements.
+   * @param {number} m The maximum number of outgoing connections on the graph (default: 16).
+   * @param {number} efConstruction The parameter that controls speed/accuracy trade-off during the index construction (default: 200).
+   * @param {number} randomSeed The seed value of random number generator (default: 100).
+   */
   initIndex(maxElements: number, m?: number, efConstruction?: number, randomSeed?: number): void;
+  /**
+   * loads the search index.
+   * @param {string} filename The filename to read from.
+   */
   loadIndex(filename: string): void;
+  /**
+   * saves the search index.
+   * @param {string} filename The filename to save to.
+   */
   saveIndex(filename: string): void;
+  /**
+   * resizes the search index.
+   * @param {number} newMaxElements The new maximum number of data points.
+   */
   resizeIndex(newMaxElements: number): void;
+  /**
+   * adds a datum point to the search index.
+   * @param {number[]} point The datum point to be added to the search index.
+   * @param {number} label The index of the datum point to be added.
+   */
   addPoint(point: Array<number>, label: number): void;
+  /**
+   * marks the element as deleted. The marked element does not appear on the search result.
+   * @param {number} label The index of the datum point to be marked.
+   */
   markDelete(label: number): void;
+  /**
+   * unmarks the element as deleted.
+   * @param {number} label The index of the datum point to be unmarked.
+   */
   unmarkDelete(label: number): void;
+  /**
+   * returns `numNeighbors` closest items for a given query point.
+   * @param {number[]} queryPoint The query point vector.
+   * @param {number} numNeighbors The number of nearest neighbors to search for.
+   * @return {SearchResult} The search result object consists of distances and indices of the nearest neighbors found.
+   */
   searchKnn(queryPoint: Array<number>, numNeighbors: number): SearchResult;
+  /**
+   * returns a list of all elements' indices.
+   * @return {number[]} The list of indices.
+   */
   getIdsList(): Array<number>;
+  /**
+   * returns the maximum number of data points that can be indexed.
+   * @return {numbers} The maximum number of data points that can be indexed.
+   */
   getMaxElements(): number;
+  /**
+   * returns the number of data points currently indexed.
+   * @return {numbers} The number of data points currently indexed.
+   */
   getCurrentCount(): number;
+  /**
+   * returns the dimensionality of data points.
+   * @return {number} The dimensionality of data points.
+   */
   getNumDimensions(): number;
+  /**
+   * returns the `ef` parameter.
+   * @return {number} The `ef` parameter value.
+   */
   getEf(): number;
+  /**
+   * sets the `ef` parameter.
+   * @param {number} ef The size of the dynamic list for the nearest neighbors.
+   */
   setEf(ef: number): void;
 }
