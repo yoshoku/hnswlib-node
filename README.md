@@ -14,6 +14,10 @@ hierarchical navigable small world graphs.
 $ npm install hnswlib-node
 ```
 
+## Documentation
+
+* [hnswlib-node API Documentation](https://yoshoku.github.io/hnswlib-node/doc/)
+
 ## Usage
 
 ```typescript
