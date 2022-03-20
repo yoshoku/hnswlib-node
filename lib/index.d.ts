@@ -104,7 +104,7 @@ export class BruteforceSearch {
    * loads the search index.
    * @param {string} filename The filename to read from.
    */
-  loadIndex(filename: string): void;
+  loadIndex(filename: string): Promise<boolean>;
   /**
    * saves the search index.
    * @param {string} filename The filename to save to.

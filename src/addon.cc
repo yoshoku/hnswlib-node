@@ -205,6 +205,48 @@ private:
   Napi::Value getNumDimensions(const Napi::CallbackInfo& info) { return Napi::Number::New(info.Env(), dim_); }
 };
 
+class LoadBruteforceSearchIndexWorker : public Napi::AsyncWorker {
+public:
+  LoadBruteforceSearchIndexWorker(
+    const std::string& filename,
+    hnswlib::BruteforceSearch<float>* index,
+    hnswlib::SpaceInterface<float>* space,
+    Napi::Promise::Deferred deferred,
+    Napi::Function& callback
+  ) : Napi::AsyncWorker(callback), deferred(deferred), filename_(filename), index_(index), space_(space) {};
+
+  ~LoadBruteforceSearchIndexWorker(){};
+
+  void Execute() {
+    try {
+      if (index_) delete index_;
+      index_ = new hnswlib::BruteforceSearch<float>(space_, filename_);
+    } catch (const std::exception& e) {
+      SetError("Hnswlib Error: " + std::string(e.what()));
+    }
+  };
+
+  void OnOK() {
+    Napi::HandleScope scope(Env());
+    Napi::Boolean result = Napi::Boolean::New(Env(), true);
+    deferred.Resolve(result);
+    if (!Callback().IsEmpty()) Callback().Call({Env().Null(), result});
+  };
+
+  void OnError(const Napi::Error& e) {
+    Napi::HandleScope scope(Env());
+    deferred.Reject(Napi::String::New(Env(), e.Message()));
+    Callback().Call({});
+  };
+
+  Napi::Promise::Deferred deferred;
+
+private:
+  std::string filename_;
+  hnswlib::BruteforceSearch<float>* index_;
+  hnswlib::SpaceInterface<float>* space_;
+};
+
 class BruteforceSearch : public Napi::ObjectWrap<BruteforceSearch> {
 public:
   uint32_t dim_;
@@ -323,17 +365,12 @@ private:
     }
 
     const std::string filename = info[0].As<Napi::String>().ToString();
+    Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(info.Env());
+    Napi::Function callback = Napi::Function::New(env, [](const Napi::CallbackInfo& info) { return info.Env().Undefined(); });
+    LoadBruteforceSearchIndexWorker *worker = new LoadBruteforceSearchIndexWorker(filename, index_, space_, deferred, callback);
+    worker->Queue();
 
-    if (index_->data_) free(index_->data_);
-
-    try {
-      index_->loadIndex(filename, space_);
-    } catch (const std::runtime_error& e) {
-      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    return env.Null();
+    return worker->deferred.Promise();
   }
 
   Napi::Value saveIndex(const Napi::CallbackInfo& info) {
@@ -460,9 +497,9 @@ private:
     }
 
     const uint32_t k = info[1].As<Napi::Number>().Uint32Value();
-    if (k > max_elements_) {
+    if (k > index_->maxelements_) {
       Napi::Error::New(env, "Invalid the number of k-nearest neighbors (cannot be given a value greater than `maxElements`: " +
-                              std::to_string(max_elements_) + ").")
+                              std::to_string(index_->maxelements_) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
