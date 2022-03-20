@@ -321,11 +321,10 @@ private:
 
     const std::string filename = info[0].As<Napi::String>().ToString();
 
-    if (index_->data_) free(index_->data_);
-
     try {
-      index_->loadIndex(filename, space_);
-    } catch (const std::runtime_error& e) {
+      if (index_) delete index_;
+      index_ = new hnswlib::BruteforceSearch<float>(space_, filename);
+    } catch (const std::exception& e) {
       Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
       return env.Null();
     }
