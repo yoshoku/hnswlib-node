@@ -208,7 +208,6 @@ private:
 class BruteforceSearch : public Napi::ObjectWrap<BruteforceSearch> {
 public:
   uint32_t dim_;
-  uint32_t max_elements_;
   hnswlib::BruteforceSearch<float>* index_;
   hnswlib::SpaceInterface<float>* space_;
 
@@ -248,8 +247,6 @@ public:
       Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
       return;
     }
-
-    max_elements_ = 0;
   }
 
   ~BruteforceSearch() {
@@ -294,12 +291,12 @@ private:
       return env.Null();
     }
 
-    max_elements_ = info[0].As<Napi::Number>().Uint32Value();
+    const uint32_t max_elements = info[0].As<Napi::Number>().Uint32Value();
 
     if (index_) delete index_;
 
     try {
-      index_ = new hnswlib::BruteforceSearch<float>(space_, static_cast<size_t>(max_elements_));
+      index_ = new hnswlib::BruteforceSearch<float>(space_, static_cast<size_t>(max_elements));
     } catch (const std::bad_alloc& err) {
       index_ = nullptr;
       Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
@@ -460,9 +457,9 @@ private:
     }
 
     const uint32_t k = info[1].As<Napi::Number>().Uint32Value();
-    if (k > max_elements_) {
+    if (k > index_->maxelements_) {
       Napi::Error::New(env, "Invalid the number of k-nearest neighbors (cannot be given a value greater than `maxElements`: " +
-                              std::to_string(max_elements_) + ").")
+                              std::to_string(index_->maxelements_) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
