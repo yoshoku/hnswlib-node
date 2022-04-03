@@ -7,3 +7,5 @@
 node_modules/
 build/
 commitlint.config.js
+tsconfig.json
+yarn.lock
