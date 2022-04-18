@@ -24,9 +24,9 @@ export type SpaceName = 'l2' | 'ip';
 /** Searh result object. */
 export interface SearchResult {
   /** The disances of the nearest negihbors found. */
-  distances: Array<number>,
+  distances: number[],
   /** The indices of the nearest neighbors found. */
-  neighbors: Array<number>
+  neighbors: number[]
 }
 
 /**
@@ -41,7 +41,7 @@ export class L2Space {
    * @param {number[]} pointB The data point vector.
    * @return {number} The distance between data points.
    */
-  distance(pointA: Array<number>, pointB: Array<number>): number;
+  distance(pointA: number[], pointB: number[]): number;
   /**
    * returns the dimensionality of space.
    * @return {number} The dimensionality of space.
@@ -61,7 +61,7 @@ export class InnerProductSpace {
    * @param {number[]} pointB The data point vector.
    * @return {number} The distance between data points.
    */
-  distance(pointA: Array<number>, pointB: Array<number>): number;
+  distance(pointA: number[], pointB: number[]): number;
   /**
    * returns the dimensionality of space.
    * @return {number} The dimensionality of space.
@@ -115,7 +115,7 @@ export class BruteforceSearch {
    * @param {number[]} point The datum point to be added to the search index.
    * @param {number} label The index of the datum point to be added.
    */
-  addPoint(point: Array<number>, label: number): void;
+  addPoint(point: number[], label: number): void;
   /**
    * removes the datum point from the search index.
    * @param {number} label The index of the datum point to be removed.
@@ -127,7 +127,7 @@ export class BruteforceSearch {
    * @param {number} numNeighbors The number of nearest neighbors to search for.
    * @return {SearchResult} The search result object consists of distances and indices of the nearest neighbors found.
    */
-  searchKnn(queryPoint: Array<number>, numNeighbors: number): SearchResult;
+  searchKnn(queryPoint: number[], numNeighbors: number): SearchResult;
   /**
    * returns the maximum number of data points that can be indexed.
    * @return {numbers} The maximum number of data points that can be indexed.
@@ -199,7 +199,7 @@ export class HierarchicalNSW {
    * @param {number[]} point The datum point to be added to the search index.
    * @param {number} label The index of the datum point to be added.
    */
-  addPoint(point: Array<number>, label: number): void;
+  addPoint(point: number[], label: number): void;
   /**
    * marks the element as deleted. The marked element does not appear on the search result.
    * @param {number} label The index of the datum point to be marked.
@@ -216,12 +216,12 @@ export class HierarchicalNSW {
    * @param {number} numNeighbors The number of nearest neighbors to search for.
    * @return {SearchResult} The search result object consists of distances and indices of the nearest neighbors found.
    */
-  searchKnn(queryPoint: Array<number>, numNeighbors: number): SearchResult;
+  searchKnn(queryPoint: number[], numNeighbors: number): SearchResult;
   /**
    * returns a list of all elements' indices.
    * @return {number[]} The list of indices.
    */
-  getIdsList(): Array<number>;
+  getIdsList(): number[];
   /**
    * returns the maximum number of data points that can be indexed.
    * @return {numbers} The maximum number of data points that can be indexed.
