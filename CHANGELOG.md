@@ -1,3 +1,7 @@
+## [[1.0.3](https://github.com/yoshoku/hnswlib-node/compare/v1.0.2...v1.0.3)] - 2022-04-14
+
+- Change array type notation in declaration file.
+
 ## [[1.0.2](https://github.com/yoshoku/hnswlib-node/compare/v1.0.1...v1.0.2)] - 2022-03-21
 
 - Change to call the constructor when loading the search index on the BruteforeceSearch class.
