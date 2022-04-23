@@ -106,6 +106,11 @@ export class BruteforceSearch {
    */
   loadIndex(filename: string): void;
   /**
+   * loads the search index.
+   * @param {string} filename The filename to read from.
+   */
+  readIndexSync(filename: string): void;
+  /**
    * saves the search index.
    * @param {string} filename The filename to save to.
    */
@@ -184,6 +189,11 @@ export class HierarchicalNSW {
    * @param {string} filename The filename to read from.
    */
   loadIndex(filename: string): void;
+  /**
+   * loads the search index.
+   * @param {string} filename The filename to read from.
+   */
+  readIndexSync(filename: string): void;
   /**
    * saves the search index.
    * @param {string} filename The filename to save to.

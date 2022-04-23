@@ -259,6 +259,7 @@ public:
     Napi::Function func = DefineClass(env, "BruteforceSearch", {
       InstanceMethod("initIndex", &BruteforceSearch::initIndex),
       InstanceMethod("loadIndex", &BruteforceSearch::loadIndex),
+      InstanceMethod("readIndexSync", &BruteforceSearch::readIndexSync),
       InstanceMethod("saveIndex", &BruteforceSearch::saveIndex),
       InstanceMethod("addPoint", &BruteforceSearch::addPoint),
       InstanceMethod("removePoint", &BruteforceSearch::removePoint),
@@ -307,6 +308,32 @@ private:
   }
 
   Napi::Value loadIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const std::string filename = info[0].As<Napi::String>().ToString();
+
+    try {
+      if (index_) delete index_;
+      index_ = new hnswlib::BruteforceSearch<float>(space_, filename);
+    } catch (const std::exception& e) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    return env.Null();
+  }
+
+  Napi::Value readIndexSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
@@ -559,6 +586,7 @@ public:
     Napi::Function func = DefineClass(env, "HierarchicalNSW", {
       InstanceMethod("initIndex", &HierarchicalNSW::initIndex),
       InstanceMethod("loadIndex", &HierarchicalNSW::loadIndex),
+      InstanceMethod("readIndexSync", &HierarchicalNSW::readIndexSync),
       InstanceMethod("saveIndex", &HierarchicalNSW::saveIndex),
       InstanceMethod("resizeIndex", &HierarchicalNSW::resizeIndex),
       InstanceMethod("addPoint", &HierarchicalNSW::addPoint),
@@ -628,6 +656,36 @@ private:
   }
 
   Napi::Value loadIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const std::string filename = info[0].As<Napi::String>().ToString();
+
+    if (index_) delete index_;
+
+    try {
+      index_ = new hnswlib::HierarchicalNSW<float>(space_, filename, false);
+    } catch (const std::runtime_error& e) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    } catch (const std::bad_alloc& err) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(err.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    return env.Null();
+  }
+
+  Napi::Value readIndexSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
