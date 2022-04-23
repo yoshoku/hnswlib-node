@@ -311,6 +311,11 @@ private:
   Napi::Value loadIndex(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
+    Napi::Function warn = env.Global().Get("console").As<Napi::Object>().Get("warn").As<Napi::Function>();
+    warn.Call({Napi::String::New(
+      env,
+      "DEPRECATION WARNING: loadIndex is deprecated and will be removed in hnswlib-node 1.2.0. Use readIndexSync instead.")});
+
     if (info.Length() != 1) {
       Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
@@ -362,6 +367,11 @@ private:
 
   Napi::Value saveIndex(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
+
+    Napi::Function warn = env.Global().Get("console").As<Napi::Object>().Get("warn").As<Napi::Function>();
+    warn.Call({Napi::String::New(
+      env,
+      "DEPRECATION WARNING: saveIndex is deprecated and will be removed in hnswlib-node 1.2.0. Use writeIndexSync instead.")});
 
     if (info.Length() != 1) {
       Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
@@ -680,6 +690,11 @@ private:
   Napi::Value loadIndex(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
+    Napi::Function warn = env.Global().Get("console").As<Napi::Object>().Get("warn").As<Napi::Function>();
+    warn.Call({Napi::String::New(
+      env,
+      "DEPRECATION WARNING: loadIndex is deprecated and will be removed in hnswlib-node 1.2.0. Use readIndexSync instead.")});
+
     if (info.Length() != 1) {
       Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
@@ -739,6 +754,11 @@ private:
 
   Napi::Value saveIndex(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
+
+    Napi::Function warn = env.Global().Get("console").As<Napi::Object>().Get("warn").As<Napi::Function>();
+    warn.Call({Napi::String::New(
+      env,
+      "DEPRECATION WARNING: saveIndex is deprecated and will be removed in hnswlib-node 1.2.0. Use writeIndexSync instead.")});
 
     if (info.Length() != 1) {
       Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
