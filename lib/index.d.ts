@@ -116,6 +116,11 @@ export class BruteforceSearch {
    */
   saveIndex(filename: string): void;
   /**
+   * saves the search index.
+   * @param {string} filename The filename to save to.
+   */
+  writeIndexSync(filename: string): void;
+  /**
    * adds a datum point to the search index.
    * @param {number[]} point The datum point to be added to the search index.
    * @param {number} label The index of the datum point to be added.
@@ -199,6 +204,11 @@ export class HierarchicalNSW {
    * @param {string} filename The filename to save to.
    */
   saveIndex(filename: string): void;
+  /**
+   * saves the search index.
+   * @param {string} filename The filename to save to.
+   */
+  writeIndexSync(filename: string): void;
   /**
    * resizes the search index.
    * @param {number} newMaxElements The new maximum number of data points.

@@ -261,6 +261,7 @@ public:
       InstanceMethod("loadIndex", &BruteforceSearch::loadIndex),
       InstanceMethod("readIndexSync", &BruteforceSearch::readIndexSync),
       InstanceMethod("saveIndex", &BruteforceSearch::saveIndex),
+      InstanceMethod("writeIndexSync", &BruteforceSearch::writeIndexSync),
       InstanceMethod("addPoint", &BruteforceSearch::addPoint),
       InstanceMethod("removePoint", &BruteforceSearch::removePoint),
       InstanceMethod("searchKnn", &BruteforceSearch::searchKnn),
@@ -360,6 +361,26 @@ private:
   }
 
   Napi::Value saveIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const std::string filename = info[0].As<Napi::String>().ToString();
+
+    index_->saveIndex(filename);
+
+    return env.Null();
+  }
+
+  Napi::Value writeIndexSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
@@ -588,6 +609,7 @@ public:
       InstanceMethod("loadIndex", &HierarchicalNSW::loadIndex),
       InstanceMethod("readIndexSync", &HierarchicalNSW::readIndexSync),
       InstanceMethod("saveIndex", &HierarchicalNSW::saveIndex),
+      InstanceMethod("writeIndexSync", &HierarchicalNSW::writeIndexSync),
       InstanceMethod("resizeIndex", &HierarchicalNSW::resizeIndex),
       InstanceMethod("addPoint", &HierarchicalNSW::addPoint),
       InstanceMethod("markDelete", &HierarchicalNSW::markDelete),
@@ -716,6 +738,26 @@ private:
   }
 
   Napi::Value saveIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const std::string filename = info[0].As<Napi::String>().ToString();
+
+    index_->saveIndex(filename);
+
+    return env.Null();
+  }
+
+  Napi::Value writeIndexSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
     if (info.Length() != 1) {
