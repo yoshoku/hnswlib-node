@@ -434,6 +434,12 @@ private:
     const std::string filename = info[0].As<Napi::String>().ToString();
 
     try {
+      std::ifstream ifs(filename);
+      if (ifs.is_open()) {
+        ifs.close();
+      } else {
+        throw std::runtime_error("failed to open file: " + filename);
+      }
       if (index_) delete index_;
       index_ = new hnswlib::BruteforceSearch<float>(space_, filename);
     } catch (const std::exception& e) {
@@ -896,6 +902,12 @@ private:
     if (index_) delete index_;
 
     try {
+      std::ifstream ifs(filename);
+      if (ifs.is_open()) {
+        ifs.close();
+      } else {
+        throw std::runtime_error("failed to open file: " + filename);
+      }
       index_ = new hnswlib::HierarchicalNSW<float>(space_, filename, false);
     } catch (const std::runtime_error& e) {
       Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
