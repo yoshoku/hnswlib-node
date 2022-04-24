@@ -559,6 +559,11 @@ private:
 
     const std::string filename = info[0].As<Napi::String>().ToString();
 
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "Search index is not constructed.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
     index_->saveIndex(filename);
 
     return env.Null();
@@ -1097,6 +1102,11 @@ private:
     }
 
     const std::string filename = info[0].As<Napi::String>().ToString();
+
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "Search index is not constructed.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
 
     index_->saveIndex(filename);
 
