@@ -259,6 +259,51 @@ private:
   hnswlib::SpaceInterface<float>** space_;
 };
 
+class SaveBruteforceSearchIndexWorker : public Napi::AsyncWorker {
+public:
+  SaveBruteforceSearchIndexWorker(const std::string& filename, hnswlib::BruteforceSearch<float>** index,
+                                  Napi::Promise::Deferred deferred, Napi::Function& callback)
+      : Napi::AsyncWorker(callback), deferred(deferred), filename_(filename), result_(false), index_(index) {}
+
+  ~SaveBruteforceSearchIndexWorker() {}
+
+  void Execute() {
+    try {
+      if (*index_ == nullptr) throw std::runtime_error("search index is not constructed.");
+      (*index_)->saveIndex(filename_);
+      result_ = true;
+    } catch (const std::exception& e) {
+      result_ = false;
+      SetError("Hnswlib Error: " + std::string(e.what()));
+    }
+  }
+
+  void OnOK() {
+    Napi::HandleScope scope(Env());
+    Napi::Boolean result = Napi::Boolean::New(Env(), result_);
+
+    deferred.Resolve(result);
+
+    if (!Callback().IsEmpty()) Callback().Call({});
+  }
+
+  void OnError(const Napi::Error& e) {
+    Napi::HandleScope scope(Env());
+    Napi::String error = Napi::String::New(Env(), e.Message());
+
+    deferred.Reject(error);
+
+    if (!Callback().IsEmpty()) Callback().Call({});
+  }
+
+  Napi::Promise::Deferred deferred;
+
+private:
+  std::string filename_;
+  bool result_;
+  hnswlib::BruteforceSearch<float>** index_;
+};
+
 class BruteforceSearch : public Napi::ObjectWrap<BruteforceSearch> {
 public:
   uint32_t dim_;
@@ -316,6 +361,7 @@ public:
       InstanceMethod("readIndex", &BruteforceSearch::readIndex),
       InstanceMethod("readIndexSync", &BruteforceSearch::readIndexSync),
       InstanceMethod("saveIndex", &BruteforceSearch::saveIndex),
+      InstanceMethod("writeIndex", &BruteforceSearch::writeIndex),
       InstanceMethod("writeIndexSync", &BruteforceSearch::writeIndexSync),
       InstanceMethod("addPoint", &BruteforceSearch::addPoint),
       InstanceMethod("removePoint", &BruteforceSearch::removePoint),
@@ -473,6 +519,29 @@ private:
     index_->saveIndex(filename);
 
     return env.Null();
+  }
+
+  Napi::Value writeIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const std::string filename = info[0].As<Napi::String>().ToString();
+    Napi::Function callback = Napi::Function::New(env, [](const Napi::CallbackInfo& info) { return info.Env().Undefined(); });
+    Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(info.Env());
+    SaveBruteforceSearchIndexWorker* worker = new SaveBruteforceSearchIndexWorker(filename, &index_, deferred, callback);
+
+    worker->Queue();
+
+    return worker->deferred.Promise();
   }
 
   Napi::Value writeIndexSync(const Napi::CallbackInfo& info) {
@@ -702,6 +771,51 @@ private:
   hnswlib::SpaceInterface<float>** space_;
 };
 
+class SaveHierarchicalNSWIndexWorker : public Napi::AsyncWorker {
+public:
+  SaveHierarchicalNSWIndexWorker(const std::string& filename, hnswlib::HierarchicalNSW<float>** index,
+                                 Napi::Promise::Deferred deferred, Napi::Function& callback)
+      : Napi::AsyncWorker(callback), deferred(deferred), filename_(filename), result_(false), index_(index) {}
+
+  ~SaveHierarchicalNSWIndexWorker() {}
+
+  void Execute() {
+    try {
+      if (*index_ == nullptr) throw std::runtime_error("search index is not constructed.");
+      (*index_)->saveIndex(filename_);
+      result_ = true;
+    } catch (const std::exception& e) {
+      result_ = false;
+      SetError("Hnswlib Error: " + std::string(e.what()));
+    }
+  }
+
+  void OnOK() {
+    Napi::HandleScope scope(Env());
+    Napi::Boolean result = Napi::Boolean::New(Env(), result_);
+
+    deferred.Resolve(result);
+
+    if (!Callback().IsEmpty()) Callback().Call({});
+  }
+
+  void OnError(const Napi::Error& e) {
+    Napi::HandleScope scope(Env());
+    Napi::String error = Napi::String::New(Env(), e.Message());
+
+    deferred.Reject(error);
+
+    if (!Callback().IsEmpty()) Callback().Call({});
+  }
+
+  Napi::Promise::Deferred deferred;
+
+private:
+  std::string filename_;
+  bool result_;
+  hnswlib::HierarchicalNSW<float>** index_;
+};
+
 class HierarchicalNSW : public Napi::ObjectWrap<HierarchicalNSW> {
 public:
   uint32_t dim_;
@@ -758,6 +872,7 @@ public:
       InstanceMethod("readIndex", &HierarchicalNSW::readIndex),
       InstanceMethod("readIndexSync", &HierarchicalNSW::readIndexSync),
       InstanceMethod("saveIndex", &HierarchicalNSW::saveIndex),
+      InstanceMethod("writeIndex", &HierarchicalNSW::writeIndex),
       InstanceMethod("writeIndexSync", &HierarchicalNSW::writeIndexSync),
       InstanceMethod("resizeIndex", &HierarchicalNSW::resizeIndex),
       InstanceMethod("addPoint", &HierarchicalNSW::addPoint),
@@ -943,6 +1058,29 @@ private:
     index_->saveIndex(filename);
 
     return env.Null();
+  }
+
+  Napi::Value writeIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const std::string filename = info[0].As<Napi::String>().ToString();
+    Napi::Function callback = Napi::Function::New(env, [](const Napi::CallbackInfo& info) { return info.Env().Undefined(); });
+    Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(info.Env());
+    SaveHierarchicalNSWIndexWorker* worker = new SaveHierarchicalNSWIndexWorker(filename, &index_, deferred, callback);
+
+    worker->Queue();
+
+    return worker->deferred.Promise();
   }
 
   Napi::Value writeIndexSync(const Napi::CallbackInfo& info) {

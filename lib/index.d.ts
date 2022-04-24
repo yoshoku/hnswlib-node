@@ -126,6 +126,11 @@ export class BruteforceSearch {
    * saves the search index.
    * @param {string} filename The filename to save to.
    */
+  writeIndex(filename: string): Promise<boolean>;
+  /**
+   * saves the search index.
+   * @param {string} filename The filename to save to.
+   */
   writeIndexSync(filename: string): void;
   /**
    * adds a datum point to the search index.
@@ -218,6 +223,11 @@ export class HierarchicalNSW {
    * @deprecated
    */
   saveIndex(filename: string): void;
+  /**
+   * saves the search index.
+   * @param {string} filename The filename to save to.
+   */
+  writeIndex(filename: string): Promise<boolean>;
   /**
    * saves the search index.
    * @param {string} filename The filename to save to.
