@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <fstream>
 #include <memory>
 #include <new>
 #include <string>
@@ -205,6 +206,59 @@ private:
   Napi::Value getNumDimensions(const Napi::CallbackInfo& info) { return Napi::Number::New(info.Env(), dim_); }
 };
 
+class LoadBruteforceSearchIndexWorker : public Napi::AsyncWorker {
+public:
+  LoadBruteforceSearchIndexWorker(const std::string& filename, hnswlib::BruteforceSearch<float>** index,
+                                  hnswlib::SpaceInterface<float>** space, Napi::Promise::Deferred deferred,
+                                  Napi::Function& callback)
+      : Napi::AsyncWorker(callback), deferred(deferred), filename_(filename), result_(false), index_(index), space_(space) {}
+
+  ~LoadBruteforceSearchIndexWorker() {}
+
+  void Execute() {
+    try {
+      std::ifstream ifs(filename_);
+      if (ifs.is_open()) {
+        ifs.close();
+      } else {
+        throw std::runtime_error("failed to open file: " + filename_);
+      }
+      if (*index_) delete *index_;
+      *index_ = new hnswlib::BruteforceSearch<float>(*space_, filename_);
+      result_ = true;
+    } catch (const std::exception& e) {
+      result_ = false;
+      SetError("Hnswlib Error: " + std::string(e.what()));
+    }
+  }
+
+  void OnOK() {
+    Napi::HandleScope scope(Env());
+    Napi::Boolean result = Napi::Boolean::New(Env(), result_);
+
+    deferred.Resolve(result);
+
+    if (!Callback().IsEmpty()) Callback().Call({});
+  }
+
+  void OnError(const Napi::Error& e) {
+    Napi::HandleScope scope(Env());
+    Napi::String error = Napi::String::New(Env(), e.Message());
+
+    deferred.Reject(error);
+
+    if (!Callback().IsEmpty()) Callback().Call({});
+  }
+
+  Napi::Promise::Deferred deferred;
+
+private:
+  std::string filename_;
+  bool result_;
+  hnswlib::BruteforceSearch<float>** index_;
+  hnswlib::SpaceInterface<float>** space_;
+};
+
 class BruteforceSearch : public Napi::ObjectWrap<BruteforceSearch> {
 public:
   uint32_t dim_;
@@ -259,6 +313,7 @@ public:
     Napi::Function func = DefineClass(env, "BruteforceSearch", {
       InstanceMethod("initIndex", &BruteforceSearch::initIndex),
       InstanceMethod("loadIndex", &BruteforceSearch::loadIndex),
+      InstanceMethod("readIndex", &BruteforceSearch::readIndex),
       InstanceMethod("readIndexSync", &BruteforceSearch::readIndexSync),
       InstanceMethod("saveIndex", &BruteforceSearch::saveIndex),
       InstanceMethod("writeIndexSync", &BruteforceSearch::writeIndexSync),
@@ -337,6 +392,30 @@ private:
     }
 
     return env.Null();
+  }
+
+  Napi::Value readIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const std::string filename = info[0].As<Napi::String>().ToString();
+    Napi::Function callback = Napi::Function::New(env, [](const Napi::CallbackInfo& info) { return info.Env().Undefined(); });
+    Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(info.Env());
+    LoadBruteforceSearchIndexWorker* worker =
+      new LoadBruteforceSearchIndexWorker(filename, &index_, &space_, deferred, callback);
+
+    worker->Queue();
+
+    return worker->deferred.Promise();
   }
 
   Napi::Value readIndexSync(const Napi::CallbackInfo& info) {
@@ -564,6 +643,59 @@ private:
   Napi::Value getNumDimensions(const Napi::CallbackInfo& info) { return Napi::Number::New(info.Env(), dim_); }
 };
 
+class LoadHierarchicalNSWIndexWorker : public Napi::AsyncWorker {
+public:
+  LoadHierarchicalNSWIndexWorker(const std::string& filename, hnswlib::HierarchicalNSW<float>** index,
+                                 hnswlib::SpaceInterface<float>** space, Napi::Promise::Deferred deferred,
+                                 Napi::Function& callback)
+      : Napi::AsyncWorker(callback), deferred(deferred), filename_(filename), result_(false), index_(index), space_(space) {}
+
+  ~LoadHierarchicalNSWIndexWorker() {}
+
+  void Execute() {
+    try {
+      std::ifstream ifs(filename_);
+      if (ifs.is_open()) {
+        ifs.close();
+      } else {
+        throw std::runtime_error("failed to open file: " + filename_);
+      }
+      if (*index_) delete *index_;
+      *index_ = new hnswlib::HierarchicalNSW<float>(*space_, filename_, false);
+      result_ = true;
+    } catch (const std::exception& e) {
+      result_ = false;
+      SetError("Hnswlib Error: " + std::string(e.what()));
+    }
+  }
+
+  void OnOK() {
+    Napi::HandleScope scope(Env());
+    Napi::Boolean result = Napi::Boolean::New(Env(), result_);
+
+    deferred.Resolve(result);
+
+    if (!Callback().IsEmpty()) Callback().Call({});
+  }
+
+  void OnError(const Napi::Error& e) {
+    Napi::HandleScope scope(Env());
+    Napi::String error = Napi::String::New(Env(), e.Message());
+
+    deferred.Reject(error);
+
+    if (!Callback().IsEmpty()) Callback().Call({});
+  }
+
+  Napi::Promise::Deferred deferred;
+
+private:
+  std::string filename_;
+  bool result_;
+  hnswlib::HierarchicalNSW<float>** index_;
+  hnswlib::SpaceInterface<float>** space_;
+};
+
 class HierarchicalNSW : public Napi::ObjectWrap<HierarchicalNSW> {
 public:
   uint32_t dim_;
@@ -617,6 +749,7 @@ public:
     Napi::Function func = DefineClass(env, "HierarchicalNSW", {
       InstanceMethod("initIndex", &HierarchicalNSW::initIndex),
       InstanceMethod("loadIndex", &HierarchicalNSW::loadIndex),
+      InstanceMethod("readIndex", &HierarchicalNSW::readIndex),
       InstanceMethod("readIndexSync", &HierarchicalNSW::readIndexSync),
       InstanceMethod("saveIndex", &HierarchicalNSW::saveIndex),
       InstanceMethod("writeIndexSync", &HierarchicalNSW::writeIndexSync),
@@ -720,6 +853,29 @@ private:
     }
 
     return env.Null();
+  }
+
+  Napi::Value readIndex(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsString()) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    const std::string filename = info[0].As<Napi::String>().ToString();
+    Napi::Function callback = Napi::Function::New(env, [](const Napi::CallbackInfo& info) { return info.Env().Undefined(); });
+    Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(info.Env());
+    LoadHierarchicalNSWIndexWorker* worker = new LoadHierarchicalNSWIndexWorker(filename, &index_, &space_, deferred, callback);
+
+    worker->Queue();
+
+    return worker->deferred.Promise();
   }
 
   Napi::Value readIndexSync(const Napi::CallbackInfo& info) {

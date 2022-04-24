@@ -110,6 +110,11 @@ export class BruteforceSearch {
    * loads the search index.
    * @param {string} filename The filename to read from.
    */
+  readIndex(filename: string): Promise<boolean>;
+  /**
+   * loads the search index.
+   * @param {string} filename The filename to read from.
+   */
   readIndexSync(filename: string): void;
   /**
    * saves the search index.
@@ -197,6 +202,11 @@ export class HierarchicalNSW {
    * @deprecated
    */
   loadIndex(filename: string): void;
+  /**
+   * loads the search index.
+   * @param {string} filename The filename to read from.
+   */
+  readIndex(filename: string): Promise<boolean>;
   /**
    * loads the search index.
    * @param {string} filename The filename to read from.
