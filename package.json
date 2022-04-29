@@ -18,7 +18,8 @@
     "prepare": "husky install",
     "build": "node-gyp build",
     "rebuild": "node-gyp rebuild",
-    "test": "jest"
+    "test": "jest",
+    "doc": "typedoc"
   },
   "dependencies": {
     "bindings": "^1.5.0",
