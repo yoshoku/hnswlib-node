@@ -235,20 +235,10 @@ public:
   void OnOK() {
     Napi::HandleScope scope(Env());
     Napi::Boolean result = Napi::Boolean::New(Env(), result_);
-
     deferred.Resolve(result);
-
-    if (!Callback().IsEmpty()) Callback().Call({});
   }
 
-  void OnError(const Napi::Error& e) {
-    Napi::HandleScope scope(Env());
-    Napi::String error = Napi::String::New(Env(), e.Message());
-
-    deferred.Reject(error);
-
-    if (!Callback().IsEmpty()) Callback().Call({});
-  }
+  void OnError(const Napi::Error& e) { deferred.Reject(e.Value()); }
 
   Napi::Promise::Deferred deferred;
 
@@ -281,20 +271,10 @@ public:
   void OnOK() {
     Napi::HandleScope scope(Env());
     Napi::Boolean result = Napi::Boolean::New(Env(), result_);
-
     deferred.Resolve(result);
-
-    if (!Callback().IsEmpty()) Callback().Call({});
   }
 
-  void OnError(const Napi::Error& e) {
-    Napi::HandleScope scope(Env());
-    Napi::String error = Napi::String::New(Env(), e.Message());
-
-    deferred.Reject(error);
-
-    if (!Callback().IsEmpty()) Callback().Call({});
-  }
+  void OnError(const Napi::Error& e) { deferred.Reject(e.Value()); }
 
   Napi::Promise::Deferred deferred;
 
@@ -752,20 +732,10 @@ public:
   void OnOK() {
     Napi::HandleScope scope(Env());
     Napi::Boolean result = Napi::Boolean::New(Env(), result_);
-
     deferred.Resolve(result);
-
-    if (!Callback().IsEmpty()) Callback().Call({});
   }
 
-  void OnError(const Napi::Error& e) {
-    Napi::HandleScope scope(Env());
-    Napi::String error = Napi::String::New(Env(), e.Message());
-
-    deferred.Reject(error);
-
-    if (!Callback().IsEmpty()) Callback().Call({});
-  }
+  void OnError(const Napi::Error& e) { deferred.Reject(e.Value()); }
 
   Napi::Promise::Deferred deferred;
 
@@ -798,20 +768,10 @@ public:
   void OnOK() {
     Napi::HandleScope scope(Env());
     Napi::Boolean result = Napi::Boolean::New(Env(), result_);
-
     deferred.Resolve(result);
-
-    if (!Callback().IsEmpty()) Callback().Call({});
   }
 
-  void OnError(const Napi::Error& e) {
-    Napi::HandleScope scope(Env());
-    Napi::String error = Napi::String::New(Env(), e.Message());
-
-    deferred.Reject(error);
-
-    if (!Callback().IsEmpty()) Callback().Call({});
-  }
+  void OnError(const Napi::Error& e) { deferred.Reject(e.Value()); }
 
   Napi::Promise::Deferred deferred;
 
