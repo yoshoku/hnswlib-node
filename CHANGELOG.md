@@ -1,3 +1,8 @@
+## [[1.2.0](https://github.com/yoshoku/hnswlib-node/compare/v1.1.0...v1.2.0)] - 2022-11-26
+
+- Update dependencies: node-addon-api@5.0.0.
+- Update dev-dependencies.
+
 ## [[1.1.0](https://github.com/yoshoku/hnswlib-node/compare/v1.0.3...v1.1.0)] - 2022-04-29
 
 - Add `readIndex`, `writeIndex`, `readIndexSync`, and `writeIndexSync` functions to BruteforeceSearch and HierarchicalNSW.
