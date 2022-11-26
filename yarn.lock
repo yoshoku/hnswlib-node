@@ -4420,9 +4420,9 @@ yargs@^17.3.1:
     yargs-parser "^21.1.1"
 
 yarn-release@^1.10.3:
-  version "1.10.3"
-  resolved "https://registry.yarnpkg.com/yarn-release/-/yarn-release-1.10.3.tgz#abcc7bc25d570d56dc4ec4fd0ffb661bc84e5360"
-  integrity sha512-lc1aUdYp3dn+UoHirqA+MvDqSHGDTQokJ74xdU81GXLRxtlv8/HmtAr+04OticzsrkUhE9xu/GpLQSR/RD2h7w==
+  version "1.10.5"
+  resolved "https://registry.yarnpkg.com/yarn-release/-/yarn-release-1.10.5.tgz#13433b61c9f9a3f4645dda8b69bc69a6c07acbbf"
+  integrity sha512-dixnymn+BzdDbWMr8NplypQvYGWO4TqQGKupMjbtLNEeKWcs5Lg+BEcGSGWuPNfBUlI1WwZEYchsodDVEX8gTg==
   dependencies:
     bluebird "^3.7.2"
     chalk "^4.1.0"
