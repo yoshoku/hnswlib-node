@@ -102,7 +102,7 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
         assert(k <= cur_element_count);
         std::priority_queue<std::pair<dist_t, labeltype >> topResults;
         if (cur_element_count == 0) return topResults;
-        for (int i = 0; i < k; i++) {
+        for (size_t i = 0; i < k; i++) {
             dist_t dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
             labeltype label = *((labeltype*) (data_ + size_per_element_ * i + data_size_));
             if ((!isIdAllowed) || (*isIdAllowed)(label)) {
@@ -110,7 +110,7 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
             }
         }
         dist_t lastdist = topResults.empty() ? std::numeric_limits<dist_t>::max() : topResults.top().first;
-        for (int i = k; i < cur_element_count; i++) {
+        for (size_t i = k; i < cur_element_count; i++) {
             dist_t dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
             if (dist <= lastdist) {
                 labeltype label = *((labeltype *) (data_ + size_per_element_ * i + data_size_));
