@@ -705,10 +705,11 @@ private:
 
 class LoadHierarchicalNSWIndexWorker : public Napi::AsyncWorker {
 public:
-  LoadHierarchicalNSWIndexWorker(const std::string& filename, hnswlib::HierarchicalNSW<float>** index,
-                                 hnswlib::SpaceInterface<float>** space, Napi::Promise::Deferred deferred,
-                                 Napi::Function& callback)
-      : Napi::AsyncWorker(callback), deferred(deferred), filename_(filename), result_(false), index_(index), space_(space) {}
+  LoadHierarchicalNSWIndexWorker(const std::string& filename, const bool allow_replace_deleted,
+                                 hnswlib::HierarchicalNSW<float>** index, hnswlib::SpaceInterface<float>** space,
+                                 Napi::Promise::Deferred deferred, Napi::Function& callback)
+      : Napi::AsyncWorker(callback), deferred(deferred), filename_(filename), allow_replace_deleted_(allow_replace_deleted),
+        result_(false), index_(index), space_(space) {}
 
   ~LoadHierarchicalNSWIndexWorker() {}
 
@@ -721,7 +722,7 @@ public:
         throw std::runtime_error("failed to open file: " + filename_);
       }
       if (*index_) delete *index_;
-      *index_ = new hnswlib::HierarchicalNSW<float>(*space_, filename_, false);
+      *index_ = new hnswlib::HierarchicalNSW<float>(*space_, filename_, false, 0, allow_replace_deleted_);
       result_ = true;
     } catch (const std::exception& e) {
       result_ = false;
@@ -741,6 +742,7 @@ public:
 
 private:
   std::string filename_;
+  bool allow_replace_deleted_;
   bool result_;
   hnswlib::HierarchicalNSW<float>** index_;
   hnswlib::SpaceInterface<float>** space_;
@@ -866,7 +868,7 @@ private:
     Napi::Env env = info.Env();
 
     if (info.Length() < 1) {
-      Napi::Error::New(env, "Expected 1-4 arguments, but got " + std::to_string(info.Length()) + ".")
+      Napi::Error::New(env, "Expected 1-5 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -886,17 +888,23 @@ private:
       Napi::TypeError::New(env, "Invalid the fourth argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
+    if (!info[4].IsUndefined() && !info[4].IsBoolean()) {
+      Napi::TypeError::New(env, "Invalid the fifth argument type, must be a boolean.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
 
     const uint32_t max_elements_ = info[0].As<Napi::Number>().Uint32Value();
     const uint32_t m_ = info[1].IsUndefined() ? 16 : info[1].As<Napi::Number>().Uint32Value();
     const uint32_t ef_construction_ = info[2].IsUndefined() ? 200 : info[2].As<Napi::Number>().Uint32Value();
     const uint32_t random_seed_ = info[3].IsUndefined() ? 100 : info[3].As<Napi::Number>().Uint32Value();
+    const bool allow_replace_deleted_ = info[4].IsUndefined() ? false : info[4].As<Napi::Boolean>().Value();
 
     if (index_) delete index_;
 
     try {
       index_ = new hnswlib::HierarchicalNSW<float>(space_, static_cast<size_t>(max_elements_), static_cast<size_t>(m_),
-                                                   static_cast<size_t>(ef_construction_), static_cast<size_t>(random_seed_));
+                                                   static_cast<size_t>(ef_construction_), static_cast<size_t>(random_seed_),
+                                                   allow_replace_deleted_);
     } catch (const std::bad_alloc& err) {
       index_ = nullptr;
       Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
@@ -944,8 +952,8 @@ private:
   Napi::Value readIndex(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
-    if (info.Length() != 1) {
-      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+    if (info.Length() < 1) {
+      Napi::Error::New(env, "Expected 1-2 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -953,11 +961,17 @@ private:
       Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
       return env.Null();
     }
+    if (!info[1].IsUndefined() && !info[1].IsBoolean()) {
+      Napi::TypeError::New(env, "Invalid the second argument type, must be a boolean.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
 
     const std::string filename = info[0].As<Napi::String>().ToString();
+    const bool allow_replace_deleted = info[1].IsUndefined() ? false : info[1].As<Napi::Boolean>().Value();
     Napi::Function callback = Napi::Function::New(env, [](const Napi::CallbackInfo& info) { return info.Env().Undefined(); });
     Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(info.Env());
-    LoadHierarchicalNSWIndexWorker* worker = new LoadHierarchicalNSWIndexWorker(filename, &index_, &space_, deferred, callback);
+    LoadHierarchicalNSWIndexWorker* worker =
+      new LoadHierarchicalNSWIndexWorker(filename, allow_replace_deleted, &index_, &space_, deferred, callback);
 
     worker->Queue();
 
@@ -967,8 +981,8 @@ private:
   Napi::Value readIndexSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
-    if (info.Length() != 1) {
-      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+    if (info.Length() < 1) {
+      Napi::Error::New(env, "Expected 1-2 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -976,8 +990,13 @@ private:
       Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
       return env.Null();
     }
+    if (!info[1].IsUndefined() && !info[1].IsBoolean()) {
+      Napi::TypeError::New(env, "Invalid the second argument type, must be a boolean.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
 
     const std::string filename = info[0].As<Napi::String>().ToString();
+    const bool replace_deleted = info[1].IsUndefined() ? false : info[1].As<Napi::Boolean>().Value();
 
     if (index_) delete index_;
 
@@ -988,7 +1007,7 @@ private:
       } else {
         throw std::runtime_error("failed to open file: " + filename);
       }
-      index_ = new hnswlib::HierarchicalNSW<float>(space_, filename, false);
+      index_ = new hnswlib::HierarchicalNSW<float>(space_, filename, false, 0, replace_deleted);
     } catch (const std::runtime_error& e) {
       Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
       return env.Null();
@@ -1109,8 +1128,8 @@ private:
   Napi::Value addPoint(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
-    if (info.Length() != 2) {
-      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
+    if (info.Length() < 2) {
+      Napi::Error::New(env, "Expected 2-3 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -1120,6 +1139,10 @@ private:
     }
     if (!info[1].IsNumber()) {
       Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[2].IsUndefined() && !info[2].IsBoolean()) {
+      Napi::TypeError::New(env, "Invalid the third argument type, must be a boolean.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -1143,9 +1166,10 @@ private:
     }
 
     const uint32_t idx = info[1].As<Napi::Number>().Uint32Value();
+    const bool replace_deleted = info[2].IsUndefined() ? false : info[2].As<Napi::Boolean>().Value();
 
     try {
-      index_->addPoint(reinterpret_cast<void*>(vec.data()), static_cast<hnswlib::labeltype>(idx));
+      index_->addPoint(reinterpret_cast<void*>(vec.data()), static_cast<hnswlib::labeltype>(idx), replace_deleted);
     } catch (const std::runtime_error& e) {
       Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
       return env.Null();

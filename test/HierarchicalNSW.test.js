@@ -23,11 +23,15 @@ describe('HierarchicalNSW', () => {
     const index = new HierarchicalNSW('l2', 3);
 
     it('throws an error if no arguments are given', () => {
-      expect(() => { index.initIndex() }).toThrowError('Expected 1-4 arguments, but got 0.');
+      expect(() => { index.initIndex() }).toThrowError('Expected 1-5 arguments, but got 0.');
     });
 
     it('throws an error if given a non-Number argument', () => {
       expect(() => { index.initIndex('5') }).toThrowError('Invalid the first argument type, must be a number.');
+    });
+
+    it('thores an error if given a non-boolean object to fifth argument', () => {
+      expect(() => { index.initIndex(5, 16, 200, 1, 1) }).toThrowError('Invalid the fifth argument type, must be a boolean.');
     });
   });
 
@@ -148,7 +152,7 @@ describe('HierarchicalNSW', () => {
     const index = new HierarchicalNSW('l2', 3);
 
     it('throws an error if no arguments are given', () => {
-      expect(() => { index.addPoint() }).toThrowError('Expected 2 arguments, but got 0.');
+      expect(() => { index.addPoint() }).toThrowError('Expected 2-3 arguments, but got 0.');
     });
 
     it('throws an error if given a non-Array object to first argument', () => {

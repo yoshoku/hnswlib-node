@@ -199,8 +199,9 @@ export class HierarchicalNSW {
    * @param {number} m The maximum number of outgoing connections on the graph (default: 16).
    * @param {number} efConstruction The parameter that controls speed/accuracy trade-off during the index construction (default: 200).
    * @param {number} randomSeed The seed value of random number generator (default: 100).
+   * @param {boolean} allowReplaceDeleted The flag to replace deleted element when adding new element (default: false).
    */
-  initIndex(maxElements: number, m?: number, efConstruction?: number, randomSeed?: number): void;
+  initIndex(maxElements: number, m?: number, efConstruction?: number, randomSeed?: number, allowReplaceDeleted?: boolean): void;
   /**
    * loads the search index.
    * @param {string} filename The filename to read from.
@@ -210,13 +211,15 @@ export class HierarchicalNSW {
   /**
    * loads the search index.
    * @param {string} filename The filename to read from.
+   * @param {boolean} allowReplaceDeleted The flag to replace deleted element when adding new element (default: false).
    */
-  readIndex(filename: string): Promise<boolean>;
+  readIndex(filename: string, allowReplaceDeleted?: boolean): Promise<boolean>;
   /**
    * loads the search index.
    * @param {string} filename The filename to read from.
+   * @param {boolean} allowReplaceDeleted The flag to replace deleted element when adding new element (default: false).
    */
-  readIndexSync(filename: string): void;
+  readIndexSync(filename: string, allowReplaceDeleted?: boolean): void;
   /**
    * saves the search index.
    * @param {string} filename The filename to save to.
@@ -242,8 +245,9 @@ export class HierarchicalNSW {
    * adds a datum point to the search index.
    * @param {number[]} point The datum point to be added to the search index.
    * @param {number} label The index of the datum point to be added.
+   * @param {boolean} replaceDeleted The flag to replace a deleted element (default: false).
    */
-  addPoint(point: number[], label: number): void;
+  addPoint(point: number[], label: number, replaceDeleted?: boolean): void;
   /**
    * marks the element as deleted. The marked element does not appear on the search result.
    * @param {number} label The index of the datum point to be marked.
