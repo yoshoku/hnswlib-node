@@ -206,6 +206,17 @@ private:
   Napi::Value getNumDimensions(const Napi::CallbackInfo& info) { return Napi::Number::New(info.Env(), dim_); }
 };
 
+class CustomFilterFunctor : public hnswlib::BaseFilterFunctor {
+public:
+  CustomFilterFunctor(const Napi::Env& env, const Napi::Function& callback) : env_(env), callback_(callback) {}
+
+  bool operator()(hnswlib::labeltype id) { return callback_.Call({Napi::Number::New(env_, id)}).ToBoolean().Value(); }
+
+private:
+  Napi::Env env_;
+  Napi::Function callback_;
+};
+
 class LoadBruteforceSearchIndexWorker : public Napi::AsyncWorker {
 public:
   LoadBruteforceSearchIndexWorker(const std::string& filename, hnswlib::BruteforceSearch<float>** index,
@@ -1241,8 +1252,8 @@ private:
   Napi::Value searchKnn(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
-    if (info.Length() != 2) {
-      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
+    if (info.Length() < 2) {
+      Napi::Error::New(env, "Expected 2-3 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -1252,6 +1263,10 @@ private:
     }
     if (!info[1].IsNumber()) {
       Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[2].IsUndefined() && !info[2].IsFunction()) {
+      Napi::TypeError::New(env, "Invalid the third argument type, must be a function.").ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -1268,6 +1283,16 @@ private:
       return env.Null();
     }
 
+    CustomFilterFunctor* filterFn = nullptr;
+    if (info[2].IsFunction()) {
+      try {
+        filterFn = new CustomFilterFunctor(env, info[2].As<Napi::Function>());
+      } catch (const std::bad_alloc& err) {
+        Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
+        return env.Null();
+      }
+    }
+
     const uint32_t k = info[1].As<Napi::Number>().Uint32Value();
     if (k > index_->max_elements_) {
       Napi::Error::New(env, "Invalid the number of k-nearest neighbors (cannot be given a value greater than `maxElements`: " +
@@ -1282,7 +1307,7 @@ private:
       vec[i] = val.As<Napi::Number>().FloatValue();
     }
     std::priority_queue<std::pair<float, size_t>> knn =
-      index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k));
+      index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k), filterFn);
     const size_t n_results = knn.size();
     Napi::Array arr_distances = Napi::Array::New(env, n_results);
     Napi::Array arr_neighbors = Napi::Array::New(env, n_results);
@@ -1292,6 +1317,8 @@ private:
       arr_neighbors[i] = Napi::Number::New(env, nn.second);
       knn.pop();
     }
+
+    if (filterFn) delete filterFn;
 
     Napi::Object results = Napi::Object::New(env);
     results.Set("distances", arr_distances);

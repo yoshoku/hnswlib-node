@@ -29,6 +29,9 @@ export interface SearchResult {
   neighbors: number[]
 }
 
+/** Function for filtering elements by its labels. */
+export type FilterFunction = (label: number) => boolean;
+
 /**
  * L2 space object.
  * @param {number} numDimensions The dimensionality of space.
@@ -262,9 +265,10 @@ export class HierarchicalNSW {
    * returns `numNeighbors` closest items for a given query point.
    * @param {number[]} queryPoint The query point vector.
    * @param {number} numNeighbors The number of nearest neighbors to search for.
+   * @param {FilterFunction} filter The function filters elements by its labels.
    * @return {SearchResult} The search result object consists of distances and indices of the nearest neighbors found.
    */
-  searchKnn(queryPoint: number[], numNeighbors: number): SearchResult;
+  searchKnn(queryPoint: number[], numNeighbors: number, filter?: FilterFunction): SearchResult;
   /**
    * returns a list of all elements' indices.
    * @return {number[]} The list of indices.
