@@ -136,7 +136,7 @@ describe('BruteforceSearch', () => {
       });
 
       it('throws an error if no arguments are given', () => {
-        expect(() => { index.searchKnn() }).toThrowError('Expected 2 arguments, but got 0.');
+        expect(() => { index.searchKnn() }).toThrowError('Expected 2-3 arguments, but got 0.');
       });
 
       it('throws an error if given a non-Array object to first argument', () => {
@@ -145,6 +145,10 @@ describe('BruteforceSearch', () => {
 
       it('throws an error if given a non-Number object to second argument', () => {
         expect(() => { index.searchKnn([1, 2, 3], '2') }).toThrowError('Invalid the second argument type, must be a number.');
+      });
+
+      it('throws an error if given a non-Function object to third argument', () => {
+        expect(() => { index.searchKnn([1, 2, 3], 2, 'fnc') }).toThrowError('Invalid the third argument type, must be a function.');
       });
 
       it('throws an error if given the number of neighborhoods exceeding the maximum number of elements', () => {
@@ -172,6 +176,23 @@ describe('BruteforceSearch', () => {
 
       it('returns search results based on one minus inner product', () => {
         expect(index.searchKnn([1, 2, 5], 2)).toMatchObject({ distances: [ -35, -27 ], neighbors: [ 2, 1 ] });
+      });
+    });
+
+    describe('when filter function is given', () => {
+      const index = new BruteforceSearch('l2', 3);
+      const filter = (label) => label % 2 == 0;
+
+      beforeAll(() => {
+        index.initIndex(4);
+        index.addPoint([1, 2, 3], 0);
+        index.addPoint([1, 2, 5], 1);
+        index.addPoint([1, 2, 4], 2);
+        index.addPoint([1, 2, 5], 3);
+      });
+
+      it('returns filtered search results', () => {
+        expect(index.searchKnn([1, 2, 5], 4, filter)).toMatchObject({ distances: [1, 4], neighbors: [2, 0] });
       });
     });
   });

@@ -150,9 +150,10 @@ export class BruteforceSearch {
    * returns `numNeighbors` closest items for a given query point.
    * @param {number[]} queryPoint The query point vector.
    * @param {number} numNeighbors The number of nearest neighbors to search for.
+   * @param {FilterFunction} filter The function filters elements by its labels.
    * @return {SearchResult} The search result object consists of distances and indices of the nearest neighbors found.
    */
-  searchKnn(queryPoint: number[], numNeighbors: number): SearchResult;
+  searchKnn(queryPoint: number[], numNeighbors: number, filter?: FilterFunction): SearchResult;
   /**
    * returns the maximum number of data points that can be indexed.
    * @return {numbers} The maximum number of data points that can be indexed.

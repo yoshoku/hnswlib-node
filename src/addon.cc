@@ -636,8 +636,8 @@ private:
   Napi::Value searchKnn(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
-    if (info.Length() != 2) {
-      Napi::Error::New(env, "Expected 2 arguments, but got " + std::to_string(info.Length()) + ".")
+    if (info.Length() < 2) {
+      Napi::Error::New(env, "Expected 2-3 arguments, but got " + std::to_string(info.Length()) + ".")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
@@ -649,10 +649,24 @@ private:
       Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
       return env.Null();
     }
+    if (!info[2].IsUndefined() && !info[2].IsFunction()) {
+      Napi::TypeError::New(env, "Invalid the third argument type, must be a function.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
 
     if (index_ == nullptr) {
       Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
       return env.Null();
+    }
+
+    CustomFilterFunctor* filterFn = nullptr;
+    if (info[2].IsFunction()) {
+      try {
+        filterFn = new CustomFilterFunctor(env, info[2].As<Napi::Function>());
+      } catch (const std::bad_alloc& err) {
+        Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
+        return env.Null();
+      }
     }
 
     Napi::Array arr = info[0].As<Napi::Array>();
@@ -682,7 +696,7 @@ private:
       vec[i] = val.As<Napi::Number>().FloatValue();
     }
     std::priority_queue<std::pair<float, size_t>> knn =
-      index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k));
+      index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k), filterFn);
     const size_t n_results = knn.size();
     Napi::Array arr_distances = Napi::Array::New(env, n_results);
     Napi::Array arr_neighbors = Napi::Array::New(env, n_results);
@@ -692,6 +706,8 @@ private:
       arr_neighbors[i] = Napi::Number::New(env, nn.second);
       knn.pop();
     }
+
+    if (filterFn) delete filterFn;
 
     Napi::Object results = Napi::Object::New(env);
     results.Set("distances", arr_distances);
