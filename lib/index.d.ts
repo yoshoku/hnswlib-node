@@ -207,6 +207,16 @@ export class HierarchicalNSW {
    */
   initIndex(maxElements: number, m?: number, efConstruction?: number, randomSeed?: number, allowReplaceDeleted?: boolean): void;
   /**
+   * Initialize index.
+   * @param {Object} __namedParameters The parameters for initIndex.
+   * @param {number} __namedParameters.maxElements The maximum number of elements.
+   * @param {number} __namedParameters.m The maximum number of outgoing connections on the graph (default: 16).
+   * @param {number} __namedParameters.efConstruction The parameter that controls speed/accuracy trade-off during the index construction (default: 200).
+   * @param {number} __namedParameters.randomSeed The seed value of random number generator (default: 100).
+   * @param {boolean} __namedParameters.allowReplaceDeleted The flag to replace deleted element when adding new element (default: false).
+   */
+  initIndex({ maxElements, m = 16, efConstruction = 200,  randomSeed = 100, allowReplaceDeleted = false } : { maxElements: number, m?: number, efConstruction?: number, randomSeed?: number, allowReplaceDeleted?: boolean }): void;
+  /**
    * loads the search index.
    * @param {string} filename The filename to read from.
    * @deprecated

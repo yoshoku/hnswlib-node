@@ -30,8 +30,16 @@ describe('HierarchicalNSW', () => {
       expect(() => { index.initIndex('5') }).toThrowError('Invalid the first argument type, must be a number.');
     });
 
-    it('thores an error if given a non-boolean object to fifth argument', () => {
+    it('throws an error if given a non-boolean object to fifth argument', () => {
       expect(() => { index.initIndex(5, 16, 200, 1, 1) }).toThrowError('Invalid the fifth argument type, must be a boolean.');
+    });
+
+    it('throws an error if empty object are given', () => {
+      expect(() => { index.initIndex({}) }).toThrowError('Missing named argument `maxElements`, must be specified.');
+    });
+
+    it('throws an error if given a non-Number to maxElements option', () => {
+      expect(() => { index.initIndex({ maxElements: '5' }) }).toThrowError('Invalid the named argument type `maxElements`, must be a number.');
     });
   });
 

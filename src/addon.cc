@@ -899,32 +899,77 @@ private:
         .ThrowAsJavaScriptException();
       return env.Null();
     }
-    if (!info[0].IsNumber()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-    if (!info[1].IsUndefined() && !info[1].IsNumber()) {
-      Napi::TypeError::New(env, "Invalid the sencond argument type, must be a number.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-    if (!info[2].IsUndefined() && !info[2].IsNumber()) {
-      Napi::TypeError::New(env, "Invalid the third argument type, must be a number.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-    if (!info[3].IsUndefined() && !info[3].IsNumber()) {
-      Napi::TypeError::New(env, "Invalid the fourth argument type, must be a number.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-    if (!info[4].IsUndefined() && !info[4].IsBoolean()) {
-      Napi::TypeError::New(env, "Invalid the fifth argument type, must be a boolean.").ThrowAsJavaScriptException();
-      return env.Null();
+
+    const bool given_named_args = info.Length() == 1 && info[0].IsObject();
+    const Napi::Object named_args = given_named_args ? info[0].As<Napi::Object>() : Napi::Object::New(env);
+
+    if (given_named_args) {
+      if (!named_args.Has("maxElements")) {
+        Napi::TypeError::New(env, "Missing named argument `maxElements`, must be specified.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (!named_args.Get("maxElements").IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the named argument type `maxElements`, must be a number.")
+          .ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (named_args.Has("m") && !named_args.Get("m").IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the named argument type `m`, must be a number.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (named_args.Has("efConstruction") && !named_args.Get("efConstruction").IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the named argument type `efConstruction`, must be a number.")
+          .ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (named_args.Has("randomSeed") && !named_args.Get("randomSeed").IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the named argument type `randomSeed`, must be a number.")
+          .ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (named_args.Has("allowReplaceDeleted") && !named_args.Get("allowReplaceDeleted").IsBoolean()) {
+        Napi::TypeError::New(env, "Invalid the named argument type `allowRepalceDeleted`, must be a boolean.")
+          .ThrowAsJavaScriptException();
+        return env.Null();
+      }
+    } else {
+      if (!info[0].IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (!info[1].IsUndefined() && !info[1].IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the sencond argument type, must be a number.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (!info[2].IsUndefined() && !info[2].IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the third argument type, must be a number.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (!info[3].IsUndefined() && !info[3].IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the fourth argument type, must be a number.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (!info[4].IsUndefined() && !info[4].IsBoolean()) {
+        Napi::TypeError::New(env, "Invalid the fifth argument type, must be a boolean.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
     }
 
-    const uint32_t max_elements_ = info[0].As<Napi::Number>().Uint32Value();
-    const uint32_t m_ = info[1].IsUndefined() ? 16 : info[1].As<Napi::Number>().Uint32Value();
-    const uint32_t ef_construction_ = info[2].IsUndefined() ? 200 : info[2].As<Napi::Number>().Uint32Value();
-    const uint32_t random_seed_ = info[3].IsUndefined() ? 100 : info[3].As<Napi::Number>().Uint32Value();
-    const bool allow_replace_deleted_ = info[4].IsUndefined() ? false : info[4].As<Napi::Boolean>().Value();
+    const uint32_t max_elements_ = given_named_args ? named_args.Get("maxElements").As<Napi::Number>().Uint32Value()
+                                                    : info[0].As<Napi::Number>().Uint32Value();
+    const uint32_t m_ = given_named_args ? (!named_args.Has("m") ? 16 : named_args.Get("m").As<Napi::Number>().Uint32Value())
+                                         : (info[1].IsUndefined() ? 16 : info[1].As<Napi::Number>().Uint32Value());
+    const uint32_t ef_construction_ =
+      given_named_args
+        ? (!named_args.Has("efConstruction") ? 200 : named_args.Get("efConstruction").As<Napi::Number>().Uint32Value())
+        : (info[2].IsUndefined() ? 200 : info[2].As<Napi::Number>().Uint32Value());
+    const uint32_t random_seed_ =
+      given_named_args ? (!named_args.Has("randomSeed") ? 100 : named_args.Get("randomSeed").As<Napi::Number>().Uint32Value())
+                       : (info[3].IsUndefined() ? 100 : info[3].As<Napi::Number>().Uint32Value());
+    const bool allow_replace_deleted_ =
+      given_named_args
+        ? (!named_args.Has("allowReplaceDeleted") ? false : named_args.Get("allowReplaceDeleted").As<Napi::Boolean>().Value())
+        : (info[4].IsUndefined() ? false : info[4].As<Napi::Boolean>().Value());
 
     if (index_) delete index_;
 
