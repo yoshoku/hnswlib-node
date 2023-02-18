@@ -106,12 +106,6 @@ export class BruteforceSearch {
   /**
    * loads the search index.
    * @param {string} filename The filename to read from.
-   * @deprecated
-   */
-  loadIndex(filename: string): void;
-  /**
-   * loads the search index.
-   * @param {string} filename The filename to read from.
    */
   readIndex(filename: string): Promise<boolean>;
   /**
@@ -119,12 +113,6 @@ export class BruteforceSearch {
    * @param {string} filename The filename to read from.
    */
   readIndexSync(filename: string): void;
-  /**
-   * saves the search index.
-   * @param {string} filename The filename to save to.
-   * @deprecated
-   */
-  saveIndex(filename: string): void;
   /**
    * saves the search index.
    * @param {string} filename The filename to save to.
@@ -219,12 +207,6 @@ export class HierarchicalNSW {
   /**
    * loads the search index.
    * @param {string} filename The filename to read from.
-   * @deprecated
-   */
-  loadIndex(filename: string): void;
-  /**
-   * loads the search index.
-   * @param {string} filename The filename to read from.
    * @param {boolean} allowReplaceDeleted The flag to replace deleted element when adding new element (default: false).
    */
   readIndex(filename: string, allowReplaceDeleted?: boolean): Promise<boolean>;
@@ -234,12 +216,6 @@ export class HierarchicalNSW {
    * @param {boolean} allowReplaceDeleted The flag to replace deleted element when adding new element (default: false).
    */
   readIndexSync(filename: string, allowReplaceDeleted?: boolean): void;
-  /**
-   * saves the search index.
-   * @param {string} filename The filename to save to.
-   * @deprecated
-   */
-  saveIndex(filename: string): void;
   /**
    * saves the search index.
    * @param {string} filename The filename to save to.

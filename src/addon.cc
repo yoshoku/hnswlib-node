@@ -348,10 +348,8 @@ public:
     // clang-format off
     Napi::Function func = DefineClass(env, "BruteforceSearch", {
       InstanceMethod("initIndex", &BruteforceSearch::initIndex),
-      InstanceMethod("loadIndex", &BruteforceSearch::loadIndex),
       InstanceMethod("readIndex", &BruteforceSearch::readIndex),
       InstanceMethod("readIndexSync", &BruteforceSearch::readIndexSync),
-      InstanceMethod("saveIndex", &BruteforceSearch::saveIndex),
       InstanceMethod("writeIndex", &BruteforceSearch::writeIndex),
       InstanceMethod("writeIndexSync", &BruteforceSearch::writeIndexSync),
       InstanceMethod("addPoint", &BruteforceSearch::addPoint),
@@ -394,37 +392,6 @@ private:
     } catch (const std::bad_alloc& err) {
       index_ = nullptr;
       Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    return env.Null();
-  }
-
-  Napi::Value loadIndex(const Napi::CallbackInfo& info) {
-    Napi::Env env = info.Env();
-
-    Napi::Function warn = env.Global().Get("console").As<Napi::Object>().Get("warn").As<Napi::Function>();
-    warn.Call({Napi::String::New(
-      env,
-      "DEPRECATION WARNING: loadIndex is deprecated and will be removed in hnswlib-node 1.2.0. Use readIndexSync instead.")});
-
-    if (info.Length() != 1) {
-      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
-        .ThrowAsJavaScriptException();
-      return env.Null();
-    }
-    if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    const std::string filename = info[0].As<Napi::String>().ToString();
-
-    try {
-      if (index_) delete index_;
-      index_ = new hnswlib::BruteforceSearch<float>(space_, filename);
-    } catch (const std::exception& e) {
-      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
       return env.Null();
     }
 
@@ -483,31 +450,6 @@ private:
       Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
       return env.Null();
     }
-
-    return env.Null();
-  }
-
-  Napi::Value saveIndex(const Napi::CallbackInfo& info) {
-    Napi::Env env = info.Env();
-
-    Napi::Function warn = env.Global().Get("console").As<Napi::Object>().Get("warn").As<Napi::Function>();
-    warn.Call({Napi::String::New(
-      env,
-      "DEPRECATION WARNING: saveIndex is deprecated and will be removed in hnswlib-node 1.2.0. Use writeIndexSync instead.")});
-
-    if (info.Length() != 1) {
-      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
-        .ThrowAsJavaScriptException();
-      return env.Null();
-    }
-    if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    const std::string filename = info[0].As<Napi::String>().ToString();
-
-    index_->saveIndex(filename);
 
     return env.Null();
   }
@@ -862,10 +804,8 @@ public:
     // clang-format off
     Napi::Function func = DefineClass(env, "HierarchicalNSW", {
       InstanceMethod("initIndex", &HierarchicalNSW::initIndex),
-      InstanceMethod("loadIndex", &HierarchicalNSW::loadIndex),
       InstanceMethod("readIndex", &HierarchicalNSW::readIndex),
       InstanceMethod("readIndexSync", &HierarchicalNSW::readIndexSync),
-      InstanceMethod("saveIndex", &HierarchicalNSW::saveIndex),
       InstanceMethod("writeIndex", &HierarchicalNSW::writeIndex),
       InstanceMethod("writeIndexSync", &HierarchicalNSW::writeIndexSync),
       InstanceMethod("resizeIndex", &HierarchicalNSW::resizeIndex),
@@ -986,41 +926,6 @@ private:
     return env.Null();
   }
 
-  Napi::Value loadIndex(const Napi::CallbackInfo& info) {
-    Napi::Env env = info.Env();
-
-    Napi::Function warn = env.Global().Get("console").As<Napi::Object>().Get("warn").As<Napi::Function>();
-    warn.Call({Napi::String::New(
-      env,
-      "DEPRECATION WARNING: loadIndex is deprecated and will be removed in hnswlib-node 1.2.0. Use readIndexSync instead.")});
-
-    if (info.Length() != 1) {
-      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
-        .ThrowAsJavaScriptException();
-      return env.Null();
-    }
-    if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    const std::string filename = info[0].As<Napi::String>().ToString();
-
-    if (index_) delete index_;
-
-    try {
-      index_ = new hnswlib::HierarchicalNSW<float>(space_, filename, false);
-    } catch (const std::runtime_error& e) {
-      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
-      return env.Null();
-    } catch (const std::bad_alloc& err) {
-      Napi::Error::New(env, "Hnswlib Error: " + std::string(err.what())).ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    return env.Null();
-  }
-
   Napi::Value readIndex(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
@@ -1087,31 +992,6 @@ private:
       Napi::Error::New(env, "Hnswlib Error: " + std::string(err.what())).ThrowAsJavaScriptException();
       return env.Null();
     }
-
-    return env.Null();
-  }
-
-  Napi::Value saveIndex(const Napi::CallbackInfo& info) {
-    Napi::Env env = info.Env();
-
-    Napi::Function warn = env.Global().Get("console").As<Napi::Object>().Get("warn").As<Napi::Function>();
-    warn.Call({Napi::String::New(
-      env,
-      "DEPRECATION WARNING: saveIndex is deprecated and will be removed in hnswlib-node 1.2.0. Use writeIndexSync instead.")});
-
-    if (info.Length() != 1) {
-      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
-        .ThrowAsJavaScriptException();
-      return env.Null();
-    }
-    if (!info[0].IsString()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be a string.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    const std::string filename = info[0].As<Napi::String>().ToString();
-
-    index_->saveIndex(filename);
 
     return env.Null();
   }
