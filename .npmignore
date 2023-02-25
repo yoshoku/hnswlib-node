@@ -7,5 +7,6 @@
 node_modules/
 build/
 commitlint.config.js
+jest.config.json
 tsconfig.json
 yarn.lock
