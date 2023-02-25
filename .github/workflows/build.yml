@@ -24,3 +24,27 @@ jobs:
       run: yarn install
     - name: Build and test
       run: yarn node-gyp rebuild && yarn jest
+  build-win:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup node 18.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.x
+    - name: Install
+      run: yarn install
+    - name: Build and test
+      run: yarn node-gyp rebuild && yarn jest
+  build-mac:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup node 18.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.x
+    - name: Install
+      run: yarn install
+    - name: Build and test
+      run: yarn node-gyp rebuild && yarn jest
