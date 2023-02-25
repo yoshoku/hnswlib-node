@@ -24,7 +24,7 @@ $ npm install hnswlib-node
 Generating search index:
 
 ```typescript
-import { HierarchicalNSW } from 'hnswlib-node'
+import { HierarchicalNSW } from 'hnswlib-node';
 
 const numDimensions = 8; // the length of data point vector that will be indexed.
 const maxElements = 10; // the maximum number of data points.
@@ -47,7 +47,7 @@ index.writeIndexSync('foo.dat');
 Searching nearest neighbors:
 
 ```typescript
-import { HierarchicalNSW } from 'hnswlib-node'
+import { HierarchicalNSW } from 'hnswlib-node';
 
 // loading index.
 const index = new HierarchicalNSW('l2', 3);
