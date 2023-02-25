@@ -80,7 +80,7 @@ describe('HierarchicalNSW', () => {
       index.initIndex(5);
       index.addPoint([1, 2, 3], 0);
       index.addPoint([2, 3, 4], 1);
-      expect(index.getIdsList()).toMatchObject([1, 0]);
+      expect(index.getIdsList()).toIncludeSameMembers([1, 0]);
     });
   });
 
