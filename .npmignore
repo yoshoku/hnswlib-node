@@ -6,6 +6,8 @@
 .husky/
 node_modules/
 build/
+doc/
+test/
 commitlint.config.js
 jest.config.json
 tsconfig.json
