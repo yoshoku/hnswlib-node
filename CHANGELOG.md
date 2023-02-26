@@ -1,3 +1,10 @@
+## [[1.4.0](https://github.com/yoshoku/hnswlib-node/compare/v1.3.0...v1.4.0)] - 2023-02-26
+
+- Add development directories to npmignore.
+- Update dependencies: node-addon-api@6.0.0.
+- Update and add dev-dependencies.
+- Fix some config files.
+
 ## [[1.3.0](https://github.com/yoshoku/hnswlib-node/compare/v1.2.0...v1.3.0)] - 2023-02-19
 
 - Updete bundled hnswlib to v0.7.0.
