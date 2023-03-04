@@ -14,16 +14,33 @@
   import { HierarchicalNSW } from 'hnswlib-node';
 
   const index = new HierarchicalNSW('l2', 3);
-  index.initIndex({ maxElements: 2, allowReplaceDeleted: true });
+  index.initIndex({ maxElements: 2 });
 
-  index.addPoint([1, 2, 3], 0)
-  index.addPoint([4, 5, 6], 1)
+  index.addPoint([1, 2, 3], 1)
+  index.addPoint([4, 5, 6], 2)
 
-  // adding deletion mark to the label `1` element.
   index.markDelete(1);
 
-  // replacing with new label `1` element by specifying true to the third argument.
-  index.addPoint([6, 5, 4], 1, true);
+  // HierarchicalNSW throws the error here since the number of data points has reached maxElements:
+  // Hnswlib Error: The number of elements exceeds the specified limit
+  index.addPoint([6, 5, 4], 3);
+  ```
+  ```javascript
+  import { HierarchicalNSW } from 'hnswlib-node';
+
+  const index = new HierarchicalNSW('l2', 3);
+
+  // Initizaling the index with `allowReplaceDeleted` set to true.
+  index.initIndex({ maxElements: 2, allowReplaceDeleted: true });
+
+  index.addPoint([1, 2, 3], 1)
+  index.addPoint([4, 5, 6], 2)
+
+  index.markDelete(1);
+
+  // By setting the third argument (replaceDeleted) to true, HierarchicalNSW does not throw the error
+  // since the newly added datum point will replace the deleted datum point.
+  index.addPoint([6, 5, 4], 3, true);
   ```
 - Add support filtering function by label in `searchKnn` of BruteforeceSearch and HierarchicalNSW.
   ```javascript
