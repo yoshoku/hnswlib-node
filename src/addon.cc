@@ -814,6 +814,7 @@ public:
       InstanceMethod("unmarkDelete", &HierarchicalNSW::unmarkDelete),
       InstanceMethod("searchKnn", &HierarchicalNSW::searchKnn),
       InstanceMethod("getIdsList", &HierarchicalNSW::getIdsList),
+      InstanceMethod("getPoint", &HierarchicalNSW::getPoint),
       InstanceMethod("getMaxElements", &HierarchicalNSW::getMaxElements),
       InstanceMethod("getCurrentCount", &HierarchicalNSW::getCurrentCount),
       InstanceMethod("getNumDimensions", &HierarchicalNSW::getNumDimensions),
@@ -1278,6 +1279,33 @@ private:
       counter++;
     }
     return ids;
+  }
+
+  Napi::Value getPoint(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() != 1) {
+      Napi::Error::New(env, "Expected 1 arguments, but got " + std::to_string(info.Length()) + ".")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsNumber()) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be a number.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    if (index_ == nullptr) return Napi::Array::New(env, 0);
+
+    try {
+      const uint32_t label = info[0].As<Napi::Number>().Uint32Value();
+      std::vector<float> vec = index_->getDataByLabel<float>(static_cast<size_t>(label));
+      Napi::Array point = Napi::Array::New(env, vec.size());
+      for (size_t i = 0; i < vec.size(); i++) point[i] = Napi::Number::New(env, vec[i]);
+      return point;
+    } catch (const std::runtime_error& e) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
+      return Napi::Array::New(env, 0);
+    }
   }
 
   Napi::Value getMaxElements(const Napi::CallbackInfo& info) {

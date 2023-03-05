@@ -84,6 +84,47 @@ describe('HierarchicalNSW', () => {
     });
   });
 
+  describe('#getPoint', () => {
+    const index = new HierarchicalNSW('l2', 3);
+
+    describe('when the index is not initialized', () => {
+      it('returns an empty array if called before the index is initialized', () => {
+        expect(index.getPoint(0)).toMatchObject([]);
+      });
+    });
+
+    describe('when the index has some data points', () => {
+      beforeAll(() => {
+        index.initIndex(3);
+        index.addPoint([1, 2, 3], 0);
+        index.addPoint([2, 3, 4], 1);
+        index.addPoint([3, 4, 5], 2);
+      });
+
+      it('throws an error if no arguments are given', () => {
+        expect(() => { index.getPoint() }).toThrow('Expected 1 arguments, but got 0.');
+      });
+
+      it('throws an error if given a non-Number argument', () => {
+        expect(() => { index.getPoint('0') }).toThrow('Invalid the first argument type, must be a number.');
+      });
+
+      it('throws an error if specified a non-existent datum point', () => {
+        expect(() => { index.getPoint(3) }).toThrow('Hnswlib Error: Label not found');
+        index.resizeIndex(4);
+        index.addPoint([4, 5, 6], 3);
+        index.markDelete(3);
+        expect(() => { index.getPoint(3) }).toThrow('Hnswlib Error: Label not found');
+      });
+
+      it('returns stored datum point', () => {
+        expect(index.getPoint(0)).toMatchObject([1, 2, 3]);
+        expect(index.getPoint(1)).toMatchObject([2, 3, 4]);
+        expect(index.getPoint(2)).toMatchObject([3, 4, 5]);
+      });
+    });
+  });
+
   describe('#getMaxElements', () => {
     const index = new HierarchicalNSW('l2', 3);
 

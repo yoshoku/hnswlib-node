@@ -262,6 +262,12 @@ export class HierarchicalNSW {
    */
   getIdsList(): number[];
   /**
+   * returns the datum point vector specified by label.
+   * @param {number} label The index of the datum point.
+   * @return {number[]} The datum point vector.
+   */
+  getPoint(label: number): number[];
+  /**
    * returns the maximum number of data points that can be indexed.
    * @return {numbers} The maximum number of data points that can be indexed.
    */
