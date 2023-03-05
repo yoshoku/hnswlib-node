@@ -1,3 +1,23 @@
+## [[1.4.1](https://github.com/yoshoku/hnswlib-node/compare/v1.4.0...v1.4.1)] - 2023-03-05
+
+- Add `getPoint` function to HierarchicalNSW.
+  ```javascript
+  import { HierarchicalNSW } from 'hnswlib-node';
+
+  const index = new HierarchicalNSW('l2', 3);
+  index.initIndex({ maxElements: 2 });
+
+  index.addPoint([1, 2, 3], 1);
+  index.addPoint([4, 5, 6], 2);
+
+  console.log(index.getPoint(1));
+  // [ 1, 2, 3 ]
+  console.log(index.getPoint(2));
+  // [ 4, 5, 6 ]
+  ```
+- Fix example codes in CHANGELOG.
+- Update dev-dependencies.
+
 ## [[1.4.0](https://github.com/yoshoku/hnswlib-node/compare/v1.3.0...v1.4.0)] - 2023-02-26
 
 - Add development directories to npmignore.
@@ -16,8 +36,8 @@
   const index = new HierarchicalNSW('l2', 3);
   index.initIndex({ maxElements: 2 });
 
-  index.addPoint([1, 2, 3], 1)
-  index.addPoint([4, 5, 6], 2)
+  index.addPoint([1, 2, 3], 1);
+  index.addPoint([4, 5, 6], 2);
 
   index.markDelete(1);
 
@@ -33,8 +53,8 @@
   // Initizaling the index with `allowReplaceDeleted` set to true.
   index.initIndex({ maxElements: 2, allowReplaceDeleted: true });
 
-  index.addPoint([1, 2, 3], 1)
-  index.addPoint([4, 5, 6], 2)
+  index.addPoint([1, 2, 3], 1);
+  index.addPoint([4, 5, 6], 2);
 
   index.markDelete(1);
 
@@ -49,10 +69,10 @@
   const index = new HierarchicalNSW('l2', 3);
   index.initIndex({ maxElements: 4 });
 
-  index.addPoint([1, 2, 3], 1)
-  index.addPoint([1, 3, 3], 2)
-  index.addPoint([1, 2, 3], 3)
-  index.addPoint([1, 3, 3], 4)
+  index.addPoint([1, 2, 3], 1);
+  index.addPoint([1, 3, 3], 2);
+  index.addPoint([1, 2, 3], 3);
+  index.addPoint([1, 3, 3], 4);
 
   // setting filter funtion that allows only even labels.
   const filter = (label: number): boolean => label % 2 == 0;
