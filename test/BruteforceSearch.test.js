@@ -14,8 +14,8 @@ describe('BruteforceSearch', () => {
       expect(() => { new BruteforceSearch('l2', '3') }).toThrow('Invalid the second argument type, must be a number.');
     });
 
-    it('throws an error if given a String that is neither "l2" nor "ip" to first argument', () => {
-      expect(() => { new BruteforceSearch('cos', 3) }).toThrow('Wrong space name, expected "l2" or "ip".');
+    it('throws an error if given a String that is neither "l2", "ip" nor "cos" to first argument', () => {
+      expect(() => { new BruteforceSearch('cosine', 3) }).toThrow('Wrong space name, expected "l2", "ip" or "cos".');
     });
   });
 
@@ -176,6 +176,24 @@ describe('BruteforceSearch', () => {
 
       it('returns search results based on one minus inner product', () => {
         expect(index.searchKnn([1, 2, 5], 2)).toMatchObject({ distances: [ -35, -27 ], neighbors: [ 2, 1 ] });
+      });
+    });
+
+    describe('when metric space is "cos"', () => {
+      const index = new BruteforceSearch('cos', 3);
+
+      beforeAll(() => {
+        index.initIndex(3);
+        index.addPoint([1, 2, 3], 0);
+        index.addPoint([2, 3, 4], 1);
+        index.addPoint([3, 4, 5], 2);
+      });
+
+      it('returns search results based on one minus cosine similarity', () => {
+        res = index.searchKnn([1, 2, 5], 2)
+        expect(res.neighbors).toMatchObject([0, 1]);
+        expect(res.distances[0]).toBeCloseTo(1.0 - 20.0 / (Math.sqrt(14) * Math.sqrt(30)), 6);
+        expect(res.distances[1]).toBeCloseTo(1.0 - 28.0 / (Math.sqrt(29) * Math.sqrt(30)), 6);
       });
     });
 

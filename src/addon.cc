@@ -16,15 +16,27 @@
  * limitations under the License.
  */
 
+#include <cmath>
 #include <fstream>
 #include <memory>
 #include <new>
+#include <numeric>
 #include <string>
 #include <vector>
 
 #include <napi.h>
 
 #include "hnswlib/hnswlib.h"
+
+namespace {
+void normalizePoint(std::vector<float>& vec) {
+  const size_t dim = vec.size();
+  const float norm = std::sqrt(std::fabs(std::inner_product(vec.begin(), vec.end(), vec.begin(), 0.0f)));
+  if (norm > 0.0f) {
+    for (size_t i = 0; i < dim; i++) vec[i] /= norm;
+  }
+}
+} // namespace
 
 class L2Space : public Napi::ObjectWrap<L2Space> {
 public:
@@ -300,9 +312,10 @@ public:
   uint32_t dim_;
   hnswlib::BruteforceSearch<float>* index_;
   hnswlib::SpaceInterface<float>* space_;
+  bool normalize_;
 
   BruteforceSearch(const Napi::CallbackInfo& info)
-      : Napi::ObjectWrap<BruteforceSearch>(info), index_(nullptr), space_(nullptr) {
+      : Napi::ObjectWrap<BruteforceSearch>(info), index_(nullptr), space_(nullptr), normalize_(false) {
     Napi::Env env = info.Env();
 
     if (info.Length() != 2) {
@@ -320,8 +333,8 @@ public:
     }
 
     const std::string space_name = info[0].As<Napi::String>().ToString();
-    if (space_name != "l2" && space_name != "ip") {
-      Napi::Error::New(env, "Wrong space name, expected \"l2\" or \"ip\".").ThrowAsJavaScriptException();
+    if (space_name != "l2" && space_name != "ip" && space_name != "cos") {
+      Napi::Error::New(env, "Wrong space name, expected \"l2\", \"ip\" or \"cos\".").ThrowAsJavaScriptException();
       return;
     }
 
@@ -330,8 +343,11 @@ public:
     try {
       if (space_name == "l2") {
         space_ = new hnswlib::L2Space(static_cast<size_t>(dim_));
+      } else if (space_name == "ip") {
+        space_ = new hnswlib::InnerProductSpace(static_cast<size_t>(dim_));
       } else {
         space_ = new hnswlib::InnerProductSpace(static_cast<size_t>(dim_));
+        normalize_ = true;
       }
     } catch (const std::bad_alloc& err) {
       Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
@@ -538,6 +554,8 @@ private:
       vec[i] = val.As<Napi::Number>().FloatValue();
     }
 
+    if (normalize_) normalizePoint(vec);
+
     const uint32_t idx = info[1].As<Napi::Number>().Uint32Value();
 
     try {
@@ -637,6 +655,9 @@ private:
       Napi::Value val = arr[i];
       vec[i] = val.As<Napi::Number>().FloatValue();
     }
+
+    if (normalize_) normalizePoint(vec);
+
     std::priority_queue<std::pair<float, size_t>> knn =
       index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k), filterFn);
     const size_t n_results = knn.size();
