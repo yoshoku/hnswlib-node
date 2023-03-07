@@ -181,7 +181,7 @@ export class BruteforceSearch {
  */
 export class HierarchicalNSW {
   /**
-   * @param {SpaceName} spaceName The metric space to create for the index ('l2' or 'ip').
+   * @param {SpaceName} spaceName The metric space to create for the index ('l2', 'ip', or 'cos').
    * @param {number} numDimensions The dimesionality of metric space.
    */
   constructor(spaceName: SpaceName, numDimensions: number);
