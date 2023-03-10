@@ -18,8 +18,8 @@
 
 /** @packageDocumentation */
 
-/** Distance for search index. `l2`: sum((x_i - y_i)^2), `ip`: 1 - sum(x_i * y_i), `cos`: 1 - sum(x_i * y_i) / norm(x) * norm(y). */
-export type SpaceName = 'l2' | 'ip' | 'cos';
+/** Distance for search index. `l2`: sum((x_i - y_i)^2), `ip`: 1 - sum(x_i * y_i), `cosine`: 1 - sum(x_i * y_i) / norm(x) * norm(y). */
+export type SpaceName = 'l2' | 'ip' | 'cosine';
 
 /** Searh result object. */
 export interface SearchResult {
@@ -94,7 +94,7 @@ export class InnerProductSpace {
  */
 export class BruteforceSearch {
   /**
-   * @param {SpaceName} spaceName The metric space to create for the index ('l2', 'ip', or 'cos').
+   * @param {SpaceName} spaceName The metric space to create for the index ('l2', 'ip', or 'cosine').
    * @param {number} numDimensions The dimensionality of data points.
    */
   constructor(spaceName: SpaceName, numDimensions: number);
@@ -181,7 +181,7 @@ export class BruteforceSearch {
  */
 export class HierarchicalNSW {
   /**
-   * @param {SpaceName} spaceName The metric space to create for the index ('l2', 'ip', or 'cos').
+   * @param {SpaceName} spaceName The metric space to create for the index ('l2', 'ip', or 'cosine').
    * @param {number} numDimensions The dimesionality of metric space.
    */
   constructor(spaceName: SpaceName, numDimensions: number);

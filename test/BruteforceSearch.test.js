@@ -14,8 +14,8 @@ describe('BruteforceSearch', () => {
       expect(() => { new BruteforceSearch('l2', '3') }).toThrow('Invalid the second argument type, must be a number.');
     });
 
-    it('throws an error if given a String that is neither "l2", "ip" nor "cos" to first argument', () => {
-      expect(() => { new BruteforceSearch('cosine', 3) }).toThrow('Wrong space name, expected "l2", "ip", or "cos".');
+    it('throws an error if given a String that is neither "l2", "ip" nor "cosine" to first argument', () => {
+      expect(() => { new BruteforceSearch('cos', 3) }).toThrow('Wrong space name, expected "l2", "ip", or "cosine".');
     });
   });
 
@@ -179,8 +179,8 @@ describe('BruteforceSearch', () => {
       });
     });
 
-    describe('when metric space is "cos"', () => {
-      const index = new BruteforceSearch('cos', 3);
+    describe('when metric space is "cosine"', () => {
+      const index = new BruteforceSearch('cosine', 3);
 
       beforeAll(() => {
         index.initIndex(3);
