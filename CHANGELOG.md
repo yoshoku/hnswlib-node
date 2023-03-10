@@ -1,3 +1,28 @@
+## [[1.4.2](https://github.com/yoshoku/hnswlib-node/compare/v1.4.1...v1.4.2)] - 2023-03-10
+
+- Add support for cosine space option to constructor of HierarchicalNSW and BruteforceSearch ([#51](https://github.com/yoshoku/hnswlib-node/issues/51)).
+  ```javascript
+  import { HierarchicalNSW } from 'hnswlib-node';
+
+  // Setting the spaceName argument to 'cosine'.
+  const index = new HierarchicalNSW('cosine', 3);
+  index.initIndex({ maxElements: 3 });
+
+  index.addPoint([1, 2, 3], 1);
+  index.addPoint([4, 5, 6], 2);
+  index.addPoint([7, 8, 9], 3);
+
+  // Searching based on cosine distance (1 subtract cosine similarity).
+  console.table(index.searchKnn([1, 2, 2], 2));
+  // ┌───────────┬──────────────────────┬──────────────────────┐
+  // │  (index)  │          0           │          1           │
+  // ├───────────┼──────────────────────┼──────────────────────┤
+  // │ distances │ 0.012341678142547607 │ 0.018790483474731445 │
+  // │ neighbors │          2           │          3           │
+  // └───────────┴──────────────────────┴──────────────────────┘
+  ```
+- Update dev-dependencies.
+
 ## [[1.4.1](https://github.com/yoshoku/hnswlib-node/compare/v1.4.0...v1.4.1)] - 2023-03-05
 
 - Add `getPoint` function to HierarchicalNSW.
