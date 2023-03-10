@@ -334,7 +334,7 @@ public:
 
     const std::string space_name = info[0].As<Napi::String>().ToString();
     if (space_name != "l2" && space_name != "ip" && space_name != "cos") {
-      Napi::Error::New(env, "Wrong space name, expected \"l2\", \"ip\" or \"cos\".").ThrowAsJavaScriptException();
+      Napi::Error::New(env, "Wrong space name, expected \"l2\", \"ip\", or \"cos\".").ThrowAsJavaScriptException();
       return;
     }
 

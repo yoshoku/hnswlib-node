@@ -15,7 +15,7 @@ describe('BruteforceSearch', () => {
     });
 
     it('throws an error if given a String that is neither "l2", "ip" nor "cos" to first argument', () => {
-      expect(() => { new BruteforceSearch('cosine', 3) }).toThrow('Wrong space name, expected "l2", "ip" or "cos".');
+      expect(() => { new BruteforceSearch('cosine', 3) }).toThrow('Wrong space name, expected "l2", "ip", or "cos".');
     });
   });
 
