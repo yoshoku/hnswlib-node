@@ -38,6 +38,7 @@
     "jest-extended": "^3.2.4",
     "node-gyp": "^9.3.0",
     "typedoc": "^0.24.1",
+    "typescript": "^5.0.4",
     "yarn-release": "^1.10.3"
   }
 }
