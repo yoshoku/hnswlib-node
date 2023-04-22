@@ -18,6 +18,7 @@ $ npm install hnswlib-node
 ## Documentation
 
 * [hnswlib-node API Documentation](https://yoshoku.github.io/hnswlib-node/doc/)
+* [How to run hnswlib-node on AWS Lambda](https://github.com/yoshoku/hnswlib-node/wiki/How-to-run-hnswlib-node-on-AWS-Lambda)
 
 ## Usage
 
