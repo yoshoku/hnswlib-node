@@ -7,3 +7,6 @@ updates:
       day: "friday"
       time: "10:00"
       timezone: "Asia/Tokyo"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
