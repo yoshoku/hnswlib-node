@@ -1,3 +1,9 @@
+## [[2.0.0](https://github.com/yoshoku/hnswlib-node/compare/v1.4.2...v2.0.0)] - 2023-06-24
+
+- Update dependencies: node-addon-api@7.0.0.
+  - Drop support for Node.js v14.x and v19.x.
+- Update dev-dependencies.
+
 ## [[1.4.2](https://github.com/yoshoku/hnswlib-node/compare/v1.4.1...v1.4.2)] - 2023-03-10
 
 - Add support for cosine space option to constructor of HierarchicalNSW and BruteforceSearch ([#51](https://github.com/yoshoku/hnswlib-node/issues/51)).
