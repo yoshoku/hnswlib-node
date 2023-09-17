@@ -15,7 +15,7 @@ jobs:
       matrix:
         node: ['16', '18', '20']
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup node ${{ matrix.node }}
       uses: actions/setup-node@v3
       with:
@@ -27,7 +27,7 @@ jobs:
   build-win:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup node 18.x
       uses: actions/setup-node@v3
       with:
@@ -39,7 +39,7 @@ jobs:
   build-mac:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup node 18.x
       uses: actions/setup-node@v3
       with:
