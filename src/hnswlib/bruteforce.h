@@ -84,10 +84,16 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
 
 
     void removePoint(labeltype cur_external) {
-        size_t cur_c = dict_external_to_internal[cur_external];
+        std::unique_lock<std::mutex> lock(index_lock);
 
-        dict_external_to_internal.erase(cur_external);
+        auto found = dict_external_to_internal.find(cur_external);
+        if (found == dict_external_to_internal.end()) {
+            return;
+        }
 
+        dict_external_to_internal.erase(found);
+
+        size_t cur_c = found->second;
         labeltype label = *((labeltype*)(data_ + size_per_element_ * (cur_element_count-1) + data_size_));
         dict_external_to_internal[label] = cur_c;
         memcpy(data_ + size_per_element_ * cur_c,
@@ -102,20 +108,20 @@ class BruteforceSearch : public AlgorithmInterface<dist_t> {
         assert(k <= cur_element_count);
         std::priority_queue<std::pair<dist_t, labeltype >> topResults;
         if (cur_element_count == 0) return topResults;
-        for (size_t i = 0; i < k; i++) {
+        for (int i = 0; i < k; i++) {
             dist_t dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
             labeltype label = *((labeltype*) (data_ + size_per_element_ * i + data_size_));
             if ((!isIdAllowed) || (*isIdAllowed)(label)) {
-                topResults.push(std::pair<dist_t, labeltype>(dist, label));
+                topResults.emplace(dist, label);
             }
         }
         dist_t lastdist = topResults.empty() ? std::numeric_limits<dist_t>::max() : topResults.top().first;
-        for (size_t i = k; i < cur_element_count; i++) {
+        for (int i = k; i < cur_element_count; i++) {
             dist_t dist = fstdistfunc_(query_data, data_ + size_per_element_ * i, dist_func_param_);
             if (dist <= lastdist) {
                 labeltype label = *((labeltype *) (data_ + size_per_element_ * i + data_size_));
                 if ((!isIdAllowed) || (*isIdAllowed)(label)) {
-                    topResults.push(std::pair<dist_t, labeltype>(dist, label));
+                    topResults.emplace(dist, label);
                 }
                 if (topResults.size() > k)
                     topResults.pop();
