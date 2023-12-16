@@ -1,3 +1,8 @@
+## [[2.1.0](https://github.com/yoshoku/hnswlib-node/compare/v2.0.0...v2.1.0)] - 2023-12-16
+
+- Update bundled hnswlib to v0.8.0.
+  - Multi-vector document search and epsilon search, which are added only to the C++ version, are not supported. These features will be supported in future release.
+
 ## [[2.0.0](https://github.com/yoshoku/hnswlib-node/compare/v1.4.2...v2.0.0)] - 2023-06-24
 
 - Update dependencies: node-addon-api@7.0.0.
