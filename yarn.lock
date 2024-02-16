@@ -2006,9 +2006,9 @@ eslint-plugin-jest-extended@^2.0.0:
     "@typescript-eslint/utils" "^5.10.0"
 
 eslint-plugin-jest@^27.1.6:
-  version "27.6.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-27.6.0.tgz#e5c0cf735b3c8cad0ef9db5b565b2fc99f5e55ed"
-  integrity sha512-MTlusnnDMChbElsszJvrwD1dN3x6nZl//s4JD23BxB6MgR66TZlL064su24xEIS3VACfAoHV1vgyMgPw8nkdng==
+  version "27.8.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-27.8.0.tgz#c8900c3e74e4c6b8cee67ea77dbc8de9cbd9e093"
+  integrity sha512-347hVFiu4ZKMYl5xFp0X81gLNwBdno0dl0CMpUMjwuAux9X/M2a7z+ab2VHmPL6XCT87q8nv1vaVzhIO4TE/hw==
   dependencies:
     "@typescript-eslint/utils" "^5.10.0"
 
