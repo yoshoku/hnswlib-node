@@ -1,3 +1,7 @@
+## [[2.1.1](https://github.com/yoshoku/hnswlib-node/compare/v2.1.0...v2.1.1)] - 2024-02-27
+
+- Fix type definition of `initIndex` method in `HierarchicalNSW` ([#177](https://github.com/yoshoku/hnswlib-node/pull/177)).
+
 ## [[2.1.0](https://github.com/yoshoku/hnswlib-node/compare/v2.0.0...v2.1.0)] - 2023-12-16
 
 - Update bundled hnswlib to v0.8.0.
