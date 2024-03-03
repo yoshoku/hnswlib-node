@@ -8,6 +8,7 @@ node_modules/
 build/
 doc/
 test/
+lib/index.test-d.ts
 commitlint.config.js
 jest.config.json
 tsconfig.json
