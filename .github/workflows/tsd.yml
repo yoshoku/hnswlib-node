@@ -1,0 +1,22 @@
+name: tsd
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+jobs:
+  tsd:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup node 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Install
+      run: yarn install
+    - name: Check type definitions
+      run: yarn run tsd
