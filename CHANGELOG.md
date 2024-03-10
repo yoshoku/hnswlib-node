@@ -1,3 +1,10 @@
+## [[3.0.0](https://github.com/yoshoku/hnswlib-node/compare/v2.1.1...v3.0.0)] - 2024-03-11
+
+- Update dependencies: node-addon-api@8.0.0.
+  - Drop support for Node.js v16.x.
+- Update dev-dependencies.
+- Add tests for type definitions.
+
 ## [[2.1.1](https://github.com/yoshoku/hnswlib-node/compare/v2.1.0...v2.1.1)] - 2024-02-27
 
 - Fix type definition of `initIndex` method in `HierarchicalNSW` ([#177](https://github.com/yoshoku/hnswlib-node/pull/177)).
