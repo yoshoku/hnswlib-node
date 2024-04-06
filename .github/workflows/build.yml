@@ -9,7 +9,7 @@ on:
     types: [opened, reopened, synchronize]
 
 jobs:
-  build:
+  build-node:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,6 +24,18 @@ jobs:
       run: yarn install
     - name: Build and test
       run: yarn node-gyp rebuild && yarn jest
+  build-bun:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+    - name: Install
+      run: bun install
+    - name: Build and test
+      run: bun node-gyp rebuild && bun jest
   build-win:
     runs-on: windows-latest
     steps:
