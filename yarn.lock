@@ -1987,9 +1987,9 @@ eslint-plugin-es@^3.0.0:
     regexpp "^3.0.0"
 
 eslint-plugin-jest-extended@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest-extended/-/eslint-plugin-jest-extended-2.0.0.tgz#adf4468f9d93e3723e4f856a96a36b79e62c5eaf"
-  integrity sha512-nMhVVsVcG/+Q6FMshql35WBxwx8xlBhxKgAG08WP3BYWfXrp28oxLpJVu9JSbMpfmfKGVrHwMYJGfPLRKlGB8w==
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest-extended/-/eslint-plugin-jest-extended-2.4.0.tgz#57d8fb2e8d3a1296b62962d3b90d7ac08382dddd"
+  integrity sha512-olotsH4SczpKgH/EPQZVp3jJ+YpMCsO0wNEMIx09C2/5HC0CtPrxSZ4BzPd/iZsD3bIOgO7H9e3KXVojvoMYsw==
   dependencies:
     "@typescript-eslint/utils" "^5.10.0"
 
