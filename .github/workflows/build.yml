@@ -55,7 +55,7 @@ jobs:
     - name: Setup node lts
       uses: actions/setup-node@v4
       with:
-        node-version: lts/*
+        node-version: 22.9.0
     - name: Install
       run: yarn install
     - name: Build and test
