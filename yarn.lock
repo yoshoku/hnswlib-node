@@ -1101,10 +1101,10 @@
   dependencies:
     "@sinonjs/commons" "^2.0.0"
 
-"@tsd/typescript@~5.4.3":
-  version "5.4.5"
-  resolved "https://registry.yarnpkg.com/@tsd/typescript/-/typescript-5.4.5.tgz#a7c11d3a97ddfa201f831f4e4270a169a87f7655"
-  integrity sha512-saiCxzHRhUrRxQV2JhH580aQUZiKQUXI38FcAcikcfOomAil4G4lxT0RfrrKywoAYP/rqAdYXYmNRLppcd+hQQ==
+"@tsd/typescript@~5.8.3":
+  version "5.8.3"
+  resolved "https://registry.yarnpkg.com/@tsd/typescript/-/typescript-5.8.3.tgz#ec20784da0e6c6dcbb2ec585f81cef4a02831840"
+  integrity sha512-oKarNCN1QUhG148M88mtZdOlBZWWGcInquef+U8QL7gwJkRuNo5WS45Fjsd+3hM9cDJWGpqSZ4Oo097KDx4IWA==
 
 "@types/babel__core@^7.1.14":
   version "7.1.18"
@@ -4317,12 +4317,12 @@ ts-api-utils@^2.0.0:
   resolved "https://registry.yarnpkg.com/ts-api-utils/-/ts-api-utils-2.0.0.tgz#b9d7d5f7ec9f736f4d0f09758b8607979044a900"
   integrity sha512-xCt/TOAc+EOHS1XPnijD3/yzpH6qg2xppZO1YDqGoVsNXfQfzHpOdNuXwrwOU8u4ITXJyDCTyt8w5g1sZv9ynQ==
 
-tsd@^0.31.2:
-  version "0.31.2"
-  resolved "https://registry.yarnpkg.com/tsd/-/tsd-0.31.2.tgz#9bfef86f43517e6e4b66973402daf17d094ae6d4"
-  integrity sha512-VplBAQwvYrHzVihtzXiUVXu5bGcr7uH1juQZ1lmKgkuGNGT+FechUCqmx9/zk7wibcqR2xaNEwCkDyKh+VVZnQ==
+tsd@^0.32.0:
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/tsd/-/tsd-0.32.0.tgz#3e15b0f2ecf880cafe4de1cfaa52980cf767d743"
+  integrity sha512-R5lBZCbxGBowOcW0gpQaiIjGYrG5NmU+PfFDKcc3zbtzWjML1o/zAwzdDnS2ZheSlPu9GW51azpFqEPUBq9DoQ==
   dependencies:
-    "@tsd/typescript" "~5.4.3"
+    "@tsd/typescript" "~5.8.3"
     eslint-formatter-pretty "^4.1.0"
     globby "^11.0.1"
     jest-diff "^29.0.3"
