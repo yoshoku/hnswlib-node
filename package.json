@@ -29,7 +29,7 @@
     "@commitlint/cli": "^19.0.3",
     "@commitlint/config-conventional": "^19.0.3",
     "@types/node": "^22.15.18",
-    "eslint": "^8.10.0",
+    "eslint": "^9.27.0",
     "eslint-plugin-jest": "^28.11.0",
     "eslint-plugin-jest-extended": "^3.0.0",
     "eslint-plugin-node": "^11.1.0",
