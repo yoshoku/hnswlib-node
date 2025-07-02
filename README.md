@@ -6,7 +6,7 @@
 [![Documentation](https://img.shields.io/badge/api-reference-blue.svg)](https://yoshoku.github.io/hnswlib-node/doc/)
 
 hnswlib-node provides Node.js bindings for [Hnswlib](https://github.com/nmslib/hnswlib)
-that implements approximate nearest-neghbor search based on
+that implements approximate nearest-neighbor search based on
 hierarchical navigable small world graphs.
 
 ## Installation
