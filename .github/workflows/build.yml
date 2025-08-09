@@ -16,7 +16,7 @@ jobs:
         node: ['20', '22', '24']
     steps:
     - uses: actions/checkout@v4
-    - name: Setup node ${{ matrix.node }}
+    - name: Setup Node.js ${{ matrix.node }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node }}
@@ -40,7 +40,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Setup node lts
+    - name: Setup Node.js LTS
       uses: actions/setup-node@v4
       with:
         node-version: lts/*
@@ -52,7 +52,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Setup node lts
+    - name: Setup Node.js 22.9.0
       uses: actions/setup-node@v4
       with:
         node-version: 22.9.0
