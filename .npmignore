@@ -12,4 +12,4 @@ lib/index.test-d.ts
 commitlint.config.js
 jest.config.json
 tsconfig.json
-yarn.lock
+package-lock.json

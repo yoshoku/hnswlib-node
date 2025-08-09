@@ -21,9 +21,9 @@ jobs:
       with:
         node-version: ${{ matrix.node }}
     - name: Install
-      run: yarn install
+      run: npm install
     - name: Build and test
-      run: yarn node-gyp rebuild && yarn jest
+      run: npx node-gyp rebuild && npx jest
   build-bun:
     runs-on: ubuntu-latest
     steps:
@@ -45,9 +45,9 @@ jobs:
       with:
         node-version: lts/*
     - name: Install
-      run: yarn install
+      run: npm install
     - name: Build and test
-      run: yarn node-gyp rebuild && yarn jest
+      run: npx node-gyp rebuild && npx jest
   build-mac:
     runs-on: macos-latest
     steps:
@@ -57,6 +57,6 @@ jobs:
       with:
         node-version: 22.9.0
     - name: Install
-      run: yarn install
+      run: npm install
     - name: Build and test
-      run: yarn node-gyp rebuild && yarn jest
+      run: npx node-gyp rebuild && npx jest

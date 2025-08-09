@@ -17,6 +17,6 @@ jobs:
       with:
         node-version: lts/*
     - name: Install
-      run: yarn install
+      run: npm install
     - name: Check type definitions
-      run: yarn run tsd
+      run: npx tsd
