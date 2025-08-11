@@ -55,7 +55,7 @@ jobs:
     - name: Setup Node.js 22.9.0
       uses: actions/setup-node@v4
       with:
-        node-version: 22.9.0
+        node-version: lts/*
     - name: Install
       run: npm install
     - name: Build and test
