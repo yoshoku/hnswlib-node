@@ -15,7 +15,7 @@ jobs:
       matrix:
         node: ['20', '22', '24']
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Setup Node.js ${{ matrix.node }}
       uses: actions/setup-node@v4
       with:
@@ -27,7 +27,7 @@ jobs:
   build-bun:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Setup bun
       uses: oven-sh/setup-bun@v2
       with:
@@ -39,7 +39,7 @@ jobs:
   build-win:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Setup Node.js LTS
       uses: actions/setup-node@v4
       with:
@@ -51,7 +51,7 @@ jobs:
   build-mac:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Setup Node.js 22.9.0
       uses: actions/setup-node@v4
       with:
