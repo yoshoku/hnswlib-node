@@ -344,7 +344,7 @@ describe('HierarchicalNSW', () => {
       });
 
       it('returns search results based on one minus cosine similarity', () => {
-        res = index.searchKnn([1, 2, 5], 2)
+        const res = index.searchKnn([1, 2, 5], 2)
         expect(res.neighbors).toMatchObject([0, 1]);
         expect(res.distances[0]).toBeCloseTo(1.0 - 20.0 / (Math.sqrt(14) * Math.sqrt(30)), 6);
         expect(res.distances[1]).toBeCloseTo(1.0 - 28.0 / (Math.sqrt(29) * Math.sqrt(30)), 6);
