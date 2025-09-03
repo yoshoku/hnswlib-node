@@ -2,11 +2,11 @@ const { L2Space } = require('../lib')
 
 describe('L2Space', () => {
   it('throws an error if no arguments are given', () => {
-    expect(() => { new L2Space() }).toThrow('Expected 1 arguments, but got 0.')
+    expect(() => { new L2Space() }).toThrow('Expected 1 arguments, but got 0.') // eslint-disable-line no-new
   })
 
   it('throws an error if given a non-Number argument', () => {
-    expect(() => { new L2Space('yes') }).toThrow('Invalid the first argument type, must be a number.')
+    expect(() => { new L2Space('yes') }).toThrow('Invalid the first argument type, must be a number.') // eslint-disable-line no-new
   })
 
   const space = new L2Space(3)

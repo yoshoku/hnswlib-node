@@ -2,11 +2,11 @@ const { InnerProductSpace } = require('../lib')
 
 describe('InnerProductSpace', () => {
   it('throws an error if no arguments are given', () => {
-    expect(() => { new InnerProductSpace() }).toThrow('Expected 1 arguments, but got 0.')
+    expect(() => { new InnerProductSpace() }).toThrow('Expected 1 arguments, but got 0.') // eslint-disable-line no-new
   })
 
   it('throws an error if given a non-Number argument', () => {
-    expect(() => { new InnerProductSpace('yes') }).toThrow('Invalid the first argument type, must be a number.')
+    expect(() => { new InnerProductSpace('yes') }).toThrow('Invalid the first argument type, must be a number.') // eslint-disable-line no-new
   })
 
   const space = new InnerProductSpace(3)

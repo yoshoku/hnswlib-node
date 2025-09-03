@@ -3,19 +3,19 @@ const { HierarchicalNSW } = require('../lib')
 describe('HierarchicalNSW', () => {
   describe('#constructor', () => {
     it('throws an error if no arguments are given', () => {
-      expect(() => { new HierarchicalNSW() }).toThrow('Expected 2 arguments, but got 0.')
+      expect(() => { new HierarchicalNSW() }).toThrow('Expected 2 arguments, but got 0.') // eslint-disable-line no-new
     })
 
     it('throws an error if given a non-String object to first argument', () => {
-      expect(() => { new HierarchicalNSW(1, 3) }).toThrow('Invalid the first argument type, must be a string.')
+      expect(() => { new HierarchicalNSW(1, 3) }).toThrow('Invalid the first argument type, must be a string.') // eslint-disable-line no-new
     })
 
     it('throws an error if given a non-Number object to second argument', () => {
-      expect(() => { new HierarchicalNSW('l2', '3') }).toThrow('Invalid the second argument type, must be a number.')
+      expect(() => { new HierarchicalNSW('l2', '3') }).toThrow('Invalid the second argument type, must be a number.') // eslint-disable-line no-new
     })
 
     it('throws an error if given a String that is neither "l2", "ip", nor "cosine" to first argument', () => {
-      expect(() => { new HierarchicalNSW('cos', 3) }).toThrow('Wrong space name, expected "l2", "ip", or "cosine".')
+      expect(() => { new HierarchicalNSW('cos', 3) }).toThrow('Wrong space name, expected "l2", "ip", or "cosine".') // eslint-disable-line no-new
     })
   })
 

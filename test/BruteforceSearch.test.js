@@ -3,19 +3,19 @@ const { BruteforceSearch } = require('../lib')
 describe('BruteforceSearch', () => {
   describe('#constructor', () => {
     it('throws an error if no arguments are given', () => {
-      expect(() => { new BruteforceSearch() }).toThrow('Expected 2 arguments, but got 0.')
+      expect(() => { new BruteforceSearch() }).toThrow('Expected 2 arguments, but got 0.') // eslint-disable-line no-new
     })
 
     it('throws an error if given a non-String object to first argument', () => {
-      expect(() => { new BruteforceSearch(1, 3) }).toThrow('Invalid the first argument type, must be a string.')
+      expect(() => { new BruteforceSearch(1, 3) }).toThrow('Invalid the first argument type, must be a string.') // eslint-disable-line no-new
     })
 
     it('throws an error if given a non-Number object to second argument', () => {
-      expect(() => { new BruteforceSearch('l2', '3') }).toThrow('Invalid the second argument type, must be a number.')
+      expect(() => { new BruteforceSearch('l2', '3') }).toThrow('Invalid the second argument type, must be a number.') // eslint-disable-line no-new
     })
 
     it('throws an error if given a String that is neither "l2", "ip" nor "cosine" to first argument', () => {
-      expect(() => { new BruteforceSearch('cos', 3) }).toThrow('Wrong space name, expected "l2", "ip", or "cosine".')
+      expect(() => { new BruteforceSearch('cos', 3) }).toThrow('Wrong space name, expected "l2", "ip", or "cosine".') // eslint-disable-line no-new
     })
   })
 
