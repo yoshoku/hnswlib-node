@@ -352,7 +352,7 @@ describe('HierarchicalNSW', () => {
 
     describe('when filter function is given', () => {
       const index = new HierarchicalNSW('l2', 3)
-      const filter = (label) => label % 2 == 0
+      const filter = (label) => label % 2 === 0
 
       beforeAll(() => {
         index.initIndex(4)
