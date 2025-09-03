@@ -1,6 +1,6 @@
-import js from '@eslint/js';
-import jest from 'eslint-plugin-jest';
-import jestExtended from 'eslint-plugin-jest-extended';
+import js from '@eslint/js'
+import jest from 'eslint-plugin-jest'
+import jestExtended from 'eslint-plugin-jest-extended'
 import neostandard from 'neostandard'
 
 export default [
@@ -29,4 +29,4 @@ export default [
       ...jestExtended.configs.all.rules
     }
   }
-];
+]
