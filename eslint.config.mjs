@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import jest from 'eslint-plugin-jest';
 import jestExtended from 'eslint-plugin-jest-extended';
+import neostandard from 'neostandard'
 
 export default [
   {
@@ -8,6 +9,7 @@ export default [
   },
 
   js.configs.recommended,
+  ...neostandard(),
 
   {
     files: ['test/**/*.js', 'commitlint.config.js'],
