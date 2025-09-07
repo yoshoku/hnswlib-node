@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Setup Node.js ${{ matrix.node }}
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ matrix.node }}
     - name: Install
@@ -41,7 +41,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Setup Node.js LTS
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: lts/*
     - name: Install
@@ -53,7 +53,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Setup Node.js 22.9.0
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: lts/*
     - name: Install
