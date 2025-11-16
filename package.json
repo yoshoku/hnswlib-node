@@ -26,7 +26,7 @@
     "node-addon-api": "^8.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.0.3",
+    "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^19.0.3",
     "@types/node": "^22.15.18",
     "eslint": "^9.33.0",
