@@ -1,7 +1,7 @@
 /**
  * hnswlib-node provides Node.js bindings for Hnswlib.
  *
- * Copyright (c) 2022-2025 Atsushi Tatsuma
+ * Copyright (c) 2022-2026 Atsushi Tatsuma
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
