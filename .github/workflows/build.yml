@@ -23,7 +23,7 @@ jobs:
     - name: Install
       run: npm install
     - name: Build and test
-      run: npx node-gyp rebuild && npx jest
+      run: npx node-gyp rebuild && npx vitest run
   build-bun:
     runs-on: ubuntu-latest
     steps:
@@ -35,7 +35,7 @@ jobs:
     - name: Install
       run: bun install
     - name: Build and test
-      run: bun node-gyp rebuild && bun jest
+      run: bun node-gyp rebuild && bun vitest run
   build-win:
     runs-on: windows-latest
     steps:
@@ -47,7 +47,7 @@ jobs:
     - name: Install
       run: npm install
     - name: Build and test
-      run: npx node-gyp rebuild && npx jest
+      run: npx node-gyp rebuild && npx vitest run
   build-mac:
     runs-on: macos-latest
     steps:
@@ -59,4 +59,4 @@ jobs:
     - name: Install
       run: npm install
     - name: Build and test
-      run: npx node-gyp rebuild && npx jest
+      run: npx node-gyp rebuild && npx vitest run
