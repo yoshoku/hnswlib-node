@@ -1,4 +1,0 @@
-{
-  "verbose": true,
-  "setupFilesAfterEnv": ["jest-extended/all"]
-}
