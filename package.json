@@ -34,7 +34,7 @@
     "husky": "^9.0.11",
     "jest-extended": "^7.0.0",
     "vitest": "^3.0.0",
-    "neostandard": "^0.12.2",
+    "neostandard": "^0.13.0",
     "node-gyp": "^12.1.0",
     "tsd": "^0.33.0",
     "typedoc": "^0.28.10",
