@@ -1,8 +1,3 @@
-## [[3.1.0](https://github.com/yoshoku/hnswlib-node/compare/v3.0.0...v3.1.0)] - 2026-04-25
-
-- Update bundled hnswlib to v0.9.0: https://github.com/nmslib/hnswlib/releases/tag/v0.9.0
-- Update dev-dependencies.
-
 ## [[3.0.0](https://github.com/yoshoku/hnswlib-node/compare/v2.1.1...v3.0.0)] - 2024-03-11
 
 - Update dependencies: node-addon-api@8.0.0.
