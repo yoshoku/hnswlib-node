@@ -23,7 +23,7 @@ export type SpaceName = 'l2' | 'ip' | 'cosine';
 
 /** Searh result object. */
 export interface SearchResult {
-  /** The disances of the nearest negihbors found. */
+  /** The distances of the nearest neighbors found. */
   distances: number[],
   /** The indices of the nearest neighbors found. */
   neighbors: number[]
