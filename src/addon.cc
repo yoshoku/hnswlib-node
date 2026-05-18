@@ -246,8 +246,9 @@ public:
       } else {
         throw std::runtime_error("failed to open file: " + filename_);
       }
+      hnswlib::BruteforceSearch<float>* loaded = new hnswlib::BruteforceSearch<float>(*space_, filename_);
       if (*index_) delete *index_;
-      *index_ = new hnswlib::BruteforceSearch<float>(*space_, filename_);
+      *index_ = loaded;
       result_ = true;
     } catch (const std::exception& e) {
       result_ = false;
@@ -460,8 +461,9 @@ private:
       } else {
         throw std::runtime_error("failed to open file: " + filename);
       }
+      hnswlib::BruteforceSearch<float>* loaded = new hnswlib::BruteforceSearch<float>(space_, filename);
       if (index_) delete index_;
-      index_ = new hnswlib::BruteforceSearch<float>(space_, filename);
+      index_ = loaded;
     } catch (const std::exception& e) {
       Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
       return env.Null();
@@ -711,8 +713,10 @@ public:
       } else {
         throw std::runtime_error("failed to open file: " + filename_);
       }
+      hnswlib::HierarchicalNSW<float>* loaded =
+        new hnswlib::HierarchicalNSW<float>(*space_, filename_, false, 0, allow_replace_deleted_);
       if (*index_) delete *index_;
-      *index_ = new hnswlib::HierarchicalNSW<float>(*space_, filename_, false, 0, allow_replace_deleted_);
+      *index_ = loaded;
       result_ = true;
     } catch (const std::exception& e) {
       result_ = false;
@@ -1002,8 +1006,6 @@ private:
     const std::string filename = info[0].As<Napi::String>().ToString();
     const bool replace_deleted = info[1].IsUndefined() ? false : info[1].As<Napi::Boolean>().Value();
 
-    if (index_) delete index_;
-
     try {
       std::ifstream ifs(filename);
       if (ifs.is_open()) {
@@ -1011,7 +1013,10 @@ private:
       } else {
         throw std::runtime_error("failed to open file: " + filename);
       }
-      index_ = new hnswlib::HierarchicalNSW<float>(space_, filename, false, 0, replace_deleted);
+      hnswlib::HierarchicalNSW<float>* loaded =
+        new hnswlib::HierarchicalNSW<float>(space_, filename, false, 0, replace_deleted);
+      if (index_) delete index_;
+      index_ = loaded;
     } catch (const std::runtime_error& e) {
       Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
       return env.Null();
