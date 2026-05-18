@@ -405,7 +405,7 @@ private:
 
     try {
       index_ = new hnswlib::BruteforceSearch<float>(space_, static_cast<size_t>(max_elements));
-    } catch (const std::bad_alloc& err) {
+    } catch (const std::exception& err) {
       index_ = nullptr;
       Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
       return env.Null();
@@ -944,7 +944,7 @@ private:
       index_ = new hnswlib::HierarchicalNSW<float>(space_, static_cast<size_t>(max_elements_), static_cast<size_t>(m_),
                                                    static_cast<size_t>(ef_construction_), static_cast<size_t>(random_seed_),
                                                    allow_replace_deleted_);
-    } catch (const std::bad_alloc& err) {
+    } catch (const std::exception& err) {
       index_ = nullptr;
       Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
       return env.Null();
