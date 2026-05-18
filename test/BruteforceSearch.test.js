@@ -75,7 +75,7 @@ describe('BruteforceSearch', () => {
     })
 
     it('throws an error if given a non-Array object to first argument', () => {
-      expect(() => { index.addPoint('[1, 2, 3]', 0) }).toThrow('Invalid the first argument type, must be an Array.')
+      expect(() => { index.addPoint('[1, 2, 3]', 0) }).toThrow('Invalid the first argument type, must be an Array or Float32Array.')
     })
 
     it('throws an error if given a non-Number object to second argument', () => {
@@ -140,7 +140,7 @@ describe('BruteforceSearch', () => {
       })
 
       it('throws an error if given a non-Array object to first argument', () => {
-        expect(() => { index.searchKnn('[1, 2, 3]', 2) }).toThrow('Invalid the first argument type, must be an Array.')
+        expect(() => { index.searchKnn('[1, 2, 3]', 2) }).toThrow('Invalid the first argument type, must be an Array or Float32Array.')
       })
 
       it('throws an error if given a non-Number object to second argument', () => {
@@ -211,6 +211,25 @@ describe('BruteforceSearch', () => {
 
       it('returns filtered search results', () => {
         expect(index.searchKnn([1, 2, 5], 4, filter)).toMatchObject({ distances: [1, 4], neighbors: [2, 0] })
+      })
+    })
+
+    describe('when given Float32Array input', () => {
+      const index = new BruteforceSearch('l2', 3)
+
+      beforeAll(() => {
+        index.initIndex(3)
+        index.addPoint(Float32Array.from([1, 2, 3]), 0)
+        index.addPoint(Float32Array.from([2, 3, 4]), 1)
+        index.addPoint(Float32Array.from([3, 4, 5]), 2)
+      })
+
+      it('accepts Float32Array data points and query points', () => {
+        expect(index.searchKnn(Float32Array.from([1, 2, 5]), 2)).toMatchObject({ distances: [3, 4], neighbors: [1, 0] })
+      })
+
+      it('throws if given a Float32Array of the wrong length', () => {
+        expect(() => { index.searchKnn(Float32Array.from([1, 2]), 2) }).toThrow('Invalid the given array length (expected 3, but got 2).')
       })
     })
   })

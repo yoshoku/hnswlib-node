@@ -23,8 +23,8 @@ describe('InnerProductSpace', () => {
     })
 
     it('throws an error if given a non-Array argument', () => {
-      expect(() => { space.distance('foo', [0, 1, 2]) }).toThrow('Invalid the first argument type, must be an Array.')
-      expect(() => { space.distance([0, 1, 2], 'bar') }).toThrow('Invalid the second argument type, must be an Array.')
+      expect(() => { space.distance('foo', [0, 1, 2]) }).toThrow('Invalid the first argument type, must be an Array or Float32Array.')
+      expect(() => { space.distance([0, 1, 2], 'bar') }).toThrow('Invalid the second argument type, must be an Array or Float32Array.')
     })
 
     it('throws an error if given an array with a length different from the number of dimensions', () => {
@@ -35,6 +35,14 @@ describe('InnerProductSpace', () => {
     it('calculates one minus inner product between two arrays', () => {
       expect(space.distance([1, 2, 3], [3, 4, 5])).toBeCloseTo(-25.0, 6)
       expect(space.distance([0.1, 0.2, 0.3], [0.3, 0.4, 0.5])).toBeCloseTo(0.74, 6)
+    })
+
+    it('accepts Float32Array arguments', () => {
+      expect(space.distance(Float32Array.from([1, 2, 3]), Float32Array.from([3, 4, 5]))).toBeCloseTo(-25.0, 6)
+    })
+
+    it('throws if given a Float32Array of the wrong length', () => {
+      expect(() => { space.distance(Float32Array.from([1, 2]), [3, 4, 5]) }).toThrow('Invalid the first array length (expected 3, but got 2).')
     })
   })
 })

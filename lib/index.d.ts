@@ -40,11 +40,11 @@ export class L2Space {
   constructor(numDimensions: number);
   /**
    * calculates the squared Euclidean distance between two data points.
-   * @param {number[]} pointA The data point vector.
-   * @param {number[]} pointB The data point vector.
+   * @param {number[] | Float32Array} pointA The data point vector.
+   * @param {number[] | Float32Array} pointB The data point vector.
    * @return {number} The distance between data points.
    */
-  distance(pointA: number[], pointB: number[]): number;
+  distance(pointA: number[] | Float32Array, pointB: number[] | Float32Array): number;
   /**
    * returns the dimensionality of space.
    * @return {number} The dimensionality of space.
@@ -60,11 +60,11 @@ export class InnerProductSpace {
   constructor(numDimensions: number);
   /**
    * calculates the one minus inner product between two data points.
-   * @param {number[]} pointA The data point vector.
-   * @param {number[]} pointB The data point vector.
+   * @param {number[] | Float32Array} pointA The data point vector.
+   * @param {number[] | Float32Array} pointB The data point vector.
    * @return {number} The distance between data points.
    */
-  distance(pointA: number[], pointB: number[]): number;
+  distance(pointA: number[] | Float32Array, pointB: number[] | Float32Array): number;
   /**
    * returns the dimensionality of space.
    * @return {number} The dimensionality of space.
@@ -125,10 +125,10 @@ export class BruteforceSearch {
   writeIndexSync(filename: string): void;
   /**
    * adds a datum point to the search index.
-   * @param {number[]} point The datum point to be added to the search index.
+   * @param {number[] | Float32Array} point The datum point to be added to the search index.
    * @param {number} label The index of the datum point to be added.
    */
-  addPoint(point: number[], label: number): void;
+  addPoint(point: number[] | Float32Array, label: number): void;
   /**
    * removes the datum point from the search index.
    * @param {number} label The index of the datum point to be removed.
@@ -136,12 +136,12 @@ export class BruteforceSearch {
   removePoint(label: number): void;
   /**
    * returns `numNeighbors` closest items for a given query point.
-   * @param {number[]} queryPoint The query point vector.
+   * @param {number[] | Float32Array} queryPoint The query point vector.
    * @param {number} numNeighbors The number of nearest neighbors to search for.
    * @param {FilterFunction} filter The function filters elements by its labels.
    * @return {SearchResult} The search result object consists of distances and indices of the nearest neighbors found.
    */
-  searchKnn(queryPoint: number[], numNeighbors: number, filter?: FilterFunction): SearchResult;
+  searchKnn(queryPoint: number[] | Float32Array, numNeighbors: number, filter?: FilterFunction): SearchResult;
   /**
    * returns the maximum number of data points that can be indexed.
    * @return {numbers} The maximum number of data points that can be indexed.
@@ -233,11 +233,11 @@ export class HierarchicalNSW {
   resizeIndex(newMaxElements: number): void;
   /**
    * adds a datum point to the search index.
-   * @param {number[]} point The datum point to be added to the search index.
+   * @param {number[] | Float32Array} point The datum point to be added to the search index.
    * @param {number} label The index of the datum point to be added.
    * @param {boolean} replaceDeleted The flag to replace a deleted element (default: false).
    */
-  addPoint(point: number[], label: number, replaceDeleted?: boolean): void;
+  addPoint(point: number[] | Float32Array, label: number, replaceDeleted?: boolean): void;
   /**
    * marks the element as deleted. The marked element does not appear on the search result.
    * @param {number} label The index of the datum point to be marked.
@@ -250,12 +250,12 @@ export class HierarchicalNSW {
   unmarkDelete(label: number): void;
   /**
    * returns `numNeighbors` closest items for a given query point.
-   * @param {number[]} queryPoint The query point vector.
+   * @param {number[] | Float32Array} queryPoint The query point vector.
    * @param {number} numNeighbors The number of nearest neighbors to search for.
    * @param {FilterFunction} filter The function filters elements by its labels.
    * @return {SearchResult} The search result object consists of distances and indices of the nearest neighbors found.
    */
-  searchKnn(queryPoint: number[], numNeighbors: number, filter?: FilterFunction): SearchResult;
+  searchKnn(queryPoint: number[] | Float32Array, numNeighbors: number, filter?: FilterFunction): SearchResult;
   /**
    * returns a list of all elements' indices.
    * @return {number[]} The list of indices.
