@@ -405,7 +405,7 @@ private:
 
     try {
       index_ = new hnswlib::BruteforceSearch<float>(space_, static_cast<size_t>(max_elements));
-    } catch (const std::bad_alloc& err) {
+    } catch (const std::exception& err) {
       index_ = nullptr;
       Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
       return env.Null();
@@ -895,7 +895,7 @@ private:
         return env.Null();
       }
       if (named_args.Has("allowReplaceDeleted") && !named_args.Get("allowReplaceDeleted").IsBoolean()) {
-        Napi::TypeError::New(env, "Invalid the named argument type `allowRepalceDeleted`, must be a boolean.")
+        Napi::TypeError::New(env, "Invalid the named argument type `allowReplaceDeleted`, must be a boolean.")
           .ThrowAsJavaScriptException();
         return env.Null();
       }
@@ -905,7 +905,7 @@ private:
         return env.Null();
       }
       if (!info[1].IsUndefined() && !info[1].IsNumber()) {
-        Napi::TypeError::New(env, "Invalid the sencond argument type, must be a number.").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
         return env.Null();
       }
       if (!info[2].IsUndefined() && !info[2].IsNumber()) {
@@ -944,7 +944,7 @@ private:
       index_ = new hnswlib::HierarchicalNSW<float>(space_, static_cast<size_t>(max_elements_), static_cast<size_t>(m_),
                                                    static_cast<size_t>(ef_construction_), static_cast<size_t>(random_seed_),
                                                    allow_replace_deleted_);
-    } catch (const std::bad_alloc& err) {
+    } catch (const std::exception& err) {
       index_ = nullptr;
       Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
       return env.Null();
