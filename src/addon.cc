@@ -36,6 +36,46 @@ void normalizePoint(std::vector<float>& vec) {
     for (size_t i = 0; i < dim; i++) vec[i] /= norm;
   }
 }
+
+// Returns true when `value` is an acceptable data-point vector: a JS
+// Array (of numbers) or a Float32Array.
+bool isVectorInput(const Napi::Value& value) {
+  return value.IsArray() ||
+         (value.IsTypedArray() && value.As<Napi::TypedArray>().TypedArrayType() == napi_float32_array);
+}
+
+// Extracts `dim` floats from `value`, which must already have passed
+// isVectorInput(). On a length mismatch, throws a JavaScript Error
+// (using `role` to describe the argument) and returns false;
+// otherwise fills `out` and returns true.
+bool extractVector(const Napi::Env& env, const Napi::Value& value, uint32_t dim, const char* role,
+                   std::vector<float>& out) {
+  if (value.IsArray()) {
+    const Napi::Array arr = value.As<Napi::Array>();
+    if (arr.Length() != dim) {
+      Napi::Error::New(env, "Invalid the " + std::string(role) + " length (expected " + std::to_string(dim) +
+                              ", but got " + std::to_string(arr.Length()) + ").")
+        .ThrowAsJavaScriptException();
+      return false;
+    }
+    out.resize(dim);
+    for (uint32_t i = 0; i < dim; i++) {
+      const Napi::Value element = arr[i];
+      out[i] = element.As<Napi::Number>().FloatValue();
+    }
+    return true;
+  }
+  const Napi::Float32Array arr = value.As<Napi::Float32Array>();
+  if (arr.ElementLength() != dim) {
+    Napi::Error::New(env, "Invalid the " + std::string(role) + " length (expected " + std::to_string(dim) +
+                            ", but got " + std::to_string(arr.ElementLength()) + ").")
+      .ThrowAsJavaScriptException();
+    return false;
+  }
+  const float* data = arr.Data();
+  out.assign(data, data + dim);
+  return true;
+}
 } // namespace
 
 class L2Space : public Napi::ObjectWrap<L2Space> {
@@ -85,40 +125,21 @@ private:
         .ThrowAsJavaScriptException();
       return env.Null();
     }
-    if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-    if (!info[1].IsArray()) {
-      Napi::TypeError::New(env, "Invalid the second argument type, must be an Array.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    Napi::Array arr_a = info[0].As<Napi::Array>();
-    Napi::Array arr_b = info[1].As<Napi::Array>();
-
-    if (arr_a.Length() != dim_) {
-      Napi::Error::New(env, "Invalid the first array length (expected " + std::to_string(dim_) + ", but got " +
-                              std::to_string(arr_a.Length()) + ").")
+    if (!isVectorInput(info[0])) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array or Float32Array.")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
-    if (arr_b.Length() != dim_) {
-      Napi::Error::New(env, "Invalid the second array length (expected " + std::to_string(dim_) + ", but got " +
-                              std::to_string(arr_b.Length()) + ").")
+    if (!isVectorInput(info[1])) {
+      Napi::TypeError::New(env, "Invalid the second argument type, must be an Array or Float32Array.")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
 
-    std::vector<float> vec_a(dim_, 0.0);
-    std::vector<float> vec_b(dim_, 0.0);
-
-    for (uint32_t i = 0; i < dim_; i++) {
-      Napi::Value val_a = arr_a[i];
-      Napi::Value val_b = arr_b[i];
-      vec_a[i] = val_a.As<Napi::Number>().FloatValue();
-      vec_b[i] = val_b.As<Napi::Number>().FloatValue();
-    }
+    std::vector<float> vec_a;
+    std::vector<float> vec_b;
+    if (!extractVector(env, info[0], dim_, "first array", vec_a)) return env.Null();
+    if (!extractVector(env, info[1], dim_, "second array", vec_b)) return env.Null();
 
     hnswlib::DISTFUNC<float> df = l2space_->get_dist_func();
     const float d = df(vec_a.data(), vec_b.data(), l2space_->get_dist_func_param());
@@ -175,40 +196,21 @@ private:
         .ThrowAsJavaScriptException();
       return env.Null();
     }
-    if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-    if (!info[1].IsArray()) {
-      Napi::TypeError::New(env, "Invalid the second argument type, must be an Array.").ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    Napi::Array arr_a = info[0].As<Napi::Array>();
-    Napi::Array arr_b = info[1].As<Napi::Array>();
-
-    if (arr_a.Length() != dim_) {
-      Napi::Error::New(env, "Invalid the first array length (expected " + std::to_string(dim_) + ", but got " +
-                              std::to_string(arr_a.Length()) + ").")
+    if (!isVectorInput(info[0])) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array or Float32Array.")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
-    if (arr_b.Length() != dim_) {
-      Napi::Error::New(env, "Invalid the second array length (expected " + std::to_string(dim_) + ", but got " +
-                              std::to_string(arr_b.Length()) + ").")
+    if (!isVectorInput(info[1])) {
+      Napi::TypeError::New(env, "Invalid the second argument type, must be an Array or Float32Array.")
         .ThrowAsJavaScriptException();
       return env.Null();
     }
 
-    std::vector<float> vec_a(dim_, 0.0);
-    std::vector<float> vec_b(dim_, 0.0);
-
-    for (uint32_t i = 0; i < dim_; i++) {
-      Napi::Value val_a = arr_a[i];
-      Napi::Value val_b = arr_b[i];
-      vec_a[i] = val_a.As<Napi::Number>().FloatValue();
-      vec_b[i] = val_b.As<Napi::Number>().FloatValue();
-    }
+    std::vector<float> vec_a;
+    std::vector<float> vec_b;
+    if (!extractVector(env, info[0], dim_, "first array", vec_a)) return env.Null();
+    if (!extractVector(env, info[1], dim_, "second array", vec_b)) return env.Null();
 
     hnswlib::DISTFUNC<float> df = ipspace_->get_dist_func();
     const float d = df(vec_a.data(), vec_b.data(), ipspace_->get_dist_func_param());
@@ -526,8 +528,9 @@ private:
         .ThrowAsJavaScriptException();
       return env.Null();
     }
-    if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
+    if (!isVectorInput(info[0])) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array or Float32Array.")
+        .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsNumber()) {
@@ -540,19 +543,8 @@ private:
       return env.Null();
     }
 
-    Napi::Array arr = info[0].As<Napi::Array>();
-    if (arr.Length() != dim_) {
-      Napi::Error::New(env, "Invalid the given array length (expected " + std::to_string(dim_) + ", but got " +
-                              std::to_string(arr.Length()) + ").")
-        .ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    std::vector<float> vec(dim_, 0.0);
-    for (uint32_t i = 0; i < dim_; i++) {
-      Napi::Value val = arr[i];
-      vec[i] = val.As<Napi::Number>().FloatValue();
-    }
+    std::vector<float> vec;
+    if (!extractVector(env, info[0], dim_, "given array", vec)) return env.Null();
 
     if (normalize_) normalizePoint(vec);
 
@@ -601,8 +593,9 @@ private:
         .ThrowAsJavaScriptException();
       return env.Null();
     }
-    if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
+    if (!isVectorInput(info[0])) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array or Float32Array.")
+        .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsNumber()) {
@@ -629,13 +622,8 @@ private:
       }
     }
 
-    Napi::Array arr = info[0].As<Napi::Array>();
-    if (arr.Length() != dim_) {
-      Napi::Error::New(env, "Invalid the given array length (expected " + std::to_string(dim_) + ", but got " +
-                              std::to_string(arr.Length()) + ").")
-        .ThrowAsJavaScriptException();
-      return env.Null();
-    }
+    std::vector<float> vec;
+    if (!extractVector(env, info[0], dim_, "given array", vec)) return env.Null();
 
     const uint32_t k = info[1].As<Napi::Number>().Uint32Value();
     if (k > index_->maxelements_) {
@@ -648,12 +636,6 @@ private:
       Napi::Error::New(env, "Invalid the number of k-nearest neighbors (must be a positive number).")
         .ThrowAsJavaScriptException();
       return env.Null();
-    }
-
-    std::vector<float> vec(dim_, 0.0);
-    for (uint32_t i = 0; i < dim_; i++) {
-      Napi::Value val = arr[i];
-      vec[i] = val.As<Napi::Number>().FloatValue();
     }
 
     if (normalize_) normalizePoint(vec);
@@ -1112,8 +1094,9 @@ private:
         .ThrowAsJavaScriptException();
       return env.Null();
     }
-    if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
+    if (!isVectorInput(info[0])) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array or Float32Array.")
+        .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsNumber()) {
@@ -1130,19 +1113,8 @@ private:
       return env.Null();
     }
 
-    Napi::Array arr = info[0].As<Napi::Array>();
-    if (arr.Length() != dim_) {
-      Napi::Error::New(env, "Invalid the given array length (expected " + std::to_string(dim_) + ", but got " +
-                              std::to_string(arr.Length()) + ").")
-        .ThrowAsJavaScriptException();
-      return env.Null();
-    }
-
-    std::vector<float> vec(dim_, 0.0);
-    for (uint32_t i = 0; i < dim_; i++) {
-      Napi::Value val = arr[i];
-      vec[i] = val.As<Napi::Number>().FloatValue();
-    }
+    std::vector<float> vec;
+    if (!extractVector(env, info[0], dim_, "given array", vec)) return env.Null();
 
     if (normalize_) normalizePoint(vec);
 
@@ -1227,8 +1199,9 @@ private:
         .ThrowAsJavaScriptException();
       return env.Null();
     }
-    if (!info[0].IsArray()) {
-      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
+    if (!isVectorInput(info[0])) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array or Float32Array.")
+        .ThrowAsJavaScriptException();
       return env.Null();
     }
     if (!info[1].IsNumber()) {
@@ -1245,13 +1218,8 @@ private:
       return env.Null();
     }
 
-    Napi::Array arr = info[0].As<Napi::Array>();
-    if (arr.Length() != dim_) {
-      Napi::Error::New(env, "Invalid the given array length (expected " + std::to_string(dim_) + ", but got " +
-                              std::to_string(arr.Length()) + ").")
-        .ThrowAsJavaScriptException();
-      return env.Null();
-    }
+    std::vector<float> vec;
+    if (!extractVector(env, info[0], dim_, "given array", vec)) return env.Null();
 
     CustomFilterFunctor* filterFn = nullptr;
     if (info[2].IsFunction()) {
@@ -1269,12 +1237,6 @@ private:
                               std::to_string(index_->max_elements_) + ").")
         .ThrowAsJavaScriptException();
       return env.Null();
-    }
-
-    std::vector<float> vec(dim_, 0.0);
-    for (uint32_t i = 0; i < dim_; i++) {
-      Napi::Value val = arr[i];
-      vec[i] = val.As<Napi::Number>().FloatValue();
     }
 
     if (normalize_) normalizePoint(vec);
