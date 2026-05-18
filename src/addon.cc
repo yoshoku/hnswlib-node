@@ -619,10 +619,10 @@ private:
       return env.Null();
     }
 
-    CustomFilterFunctor* filterFn = nullptr;
+    std::unique_ptr<CustomFilterFunctor> filterFn;
     if (info[2].IsFunction()) {
       try {
-        filterFn = new CustomFilterFunctor(env, info[2].As<Napi::Function>());
+        filterFn.reset(new CustomFilterFunctor(env, info[2].As<Napi::Function>()));
       } catch (const std::bad_alloc& err) {
         Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
         return env.Null();
@@ -658,8 +658,13 @@ private:
 
     if (normalize_) normalizePoint(vec);
 
-    std::priority_queue<std::pair<float, size_t>> knn =
-      index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k), filterFn);
+    std::priority_queue<std::pair<float, size_t>> knn;
+    try {
+      knn = index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k), filterFn.get());
+    } catch (const std::exception& e) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    }
     const size_t n_results = knn.size();
     Napi::Array arr_distances = Napi::Array::New(env, n_results);
     Napi::Array arr_neighbors = Napi::Array::New(env, n_results);
@@ -669,8 +674,6 @@ private:
       arr_neighbors[i] = Napi::Number::New(env, nn.second);
       knn.pop();
     }
-
-    if (filterFn) delete filterFn;
 
     Napi::Object results = Napi::Object::New(env);
     results.Set("distances", arr_distances);
@@ -1253,10 +1256,10 @@ private:
       return env.Null();
     }
 
-    CustomFilterFunctor* filterFn = nullptr;
+    std::unique_ptr<CustomFilterFunctor> filterFn;
     if (info[2].IsFunction()) {
       try {
-        filterFn = new CustomFilterFunctor(env, info[2].As<Napi::Function>());
+        filterFn.reset(new CustomFilterFunctor(env, info[2].As<Napi::Function>()));
       } catch (const std::bad_alloc& err) {
         Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
         return env.Null();
@@ -1279,8 +1282,13 @@ private:
 
     if (normalize_) normalizePoint(vec);
 
-    std::priority_queue<std::pair<float, size_t>> knn =
-      index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k), filterFn);
+    std::priority_queue<std::pair<float, size_t>> knn;
+    try {
+      knn = index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k), filterFn.get());
+    } catch (const std::exception& e) {
+      Napi::Error::New(env, "Hnswlib Error: " + std::string(e.what())).ThrowAsJavaScriptException();
+      return env.Null();
+    }
     const size_t n_results = knn.size();
     Napi::Array arr_distances = Napi::Array::New(env, n_results);
     Napi::Array arr_neighbors = Napi::Array::New(env, n_results);
@@ -1290,8 +1298,6 @@ private:
       arr_neighbors[i] = Napi::Number::New(env, nn.second);
       knn.pop();
     }
-
-    if (filterFn) delete filterFn;
 
     Napi::Object results = Napi::Object::New(env);
     results.Set("distances", arr_distances);
