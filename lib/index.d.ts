@@ -239,6 +239,16 @@ export class HierarchicalNSW {
    */
   addPoint(point: number[] | Float32Array, label: number, replaceDeleted?: boolean): void;
   /**
+   * adds multiple datum points to the search index, inserting them in parallel across worker threads.
+   * @param {(number[] | Float32Array)[]} points The datum points to be added to the search index.
+   * @param {number[]} labels The indices of the datum points to be added.
+   * @param {Object} [options] Optional settings for the batch insertion.
+   * @param {number} [options.numThreads] The number of worker threads (default: the number of available CPU cores).
+   * @param {boolean} [options.replaceDeleted] The flag to replace deleted elements (default: false).
+   * @return {Promise<void>} A promise resolved once every point has been added.
+   */
+  addPoints(points: (number[] | Float32Array)[], labels: number[], options?: { numThreads?: number, replaceDeleted?: boolean }): Promise<void>;
+  /**
    * marks the element as deleted. The marked element does not appear on the search result.
    * @param {number} label The index of the datum point to be marked.
    */

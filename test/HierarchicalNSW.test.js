@@ -227,6 +227,67 @@ describe('HierarchicalNSW', () => {
     })
   })
 
+  describe('#addPoints', () => {
+    it('throws an error if no arguments are given', () => {
+      const index = new HierarchicalNSW('l2', 3)
+      expect(() => { index.addPoints() }).toThrow('Expected 2-3 arguments, but got 0.')
+    })
+
+    it('throws an error if given a non-Array first argument', () => {
+      const index = new HierarchicalNSW('l2', 3)
+      expect(() => { index.addPoints('x', [0]) }).toThrow('Invalid the first argument type, must be an Array.')
+    })
+
+    it('throws an error if the points and labels arrays differ in length', () => {
+      const index = new HierarchicalNSW('l2', 3)
+      index.initIndex(3)
+      expect(() => { index.addPoints([[1, 2, 3]], [0, 1]) }).toThrow('The points and labels arrays must have the same length')
+    })
+
+    it('throws an error if called before the index is initialized', () => {
+      const index = new HierarchicalNSW('l2', 3)
+      expect(() => { index.addPoints([[1, 2, 3]], [0]) }).toThrow('Search index has not been initialized, call `initIndex` in advance.')
+    })
+
+    it('adds multiple points and makes them searchable', async () => {
+      const index = new HierarchicalNSW('l2', 3)
+      index.initIndex(3)
+      await index.addPoints([[1, 2, 3], [2, 3, 4], [3, 4, 5]], [0, 1, 2])
+      expect(index.getCurrentCount()).toBe(3)
+      expect(index.searchKnn([1, 2, 5], 2)).toMatchObject({ distances: [3, 4], neighbors: [1, 0] })
+    })
+
+    it('accepts Float32Array points and a numThreads option', async () => {
+      const index = new HierarchicalNSW('l2', 3)
+      index.initIndex(3)
+      await index.addPoints(
+        [Float32Array.from([1, 2, 3]), Float32Array.from([2, 3, 4]), Float32Array.from([3, 4, 5])],
+        [0, 1, 2],
+        { numThreads: 2 }
+      )
+      expect(index.searchKnn(Float32Array.from([1, 2, 5]), 2)).toMatchObject({ distances: [3, 4], neighbors: [1, 0] })
+    })
+
+    it('rejects when the points exceed the index capacity', async () => {
+      const index = new HierarchicalNSW('l2', 3)
+      index.initIndex(1)
+      await expect(index.addPoints([[1, 2, 3], [2, 3, 4]], [0, 1])).rejects.toThrow(/Hnswlib Error/)
+    })
+
+    it('throws an error if numThreads is out of range', () => {
+      const index = new HierarchicalNSW('l2', 3)
+      index.initIndex(3)
+      expect(() => { index.addPoints([[1, 2, 3]], [0], { numThreads: -1 }) }).toThrow('Invalid the option \`numThreads\`, must be between 0 and 1024.')
+    })
+
+    it('resolves for an empty batch', async () => {
+      const index = new HierarchicalNSW('l2', 3)
+      index.initIndex(3)
+      await index.addPoints([], [])
+      expect(index.getCurrentCount()).toBe(0)
+    })
+  })
+
   describe('#markDelete', () => {
     const index = new HierarchicalNSW('l2', 3)
 

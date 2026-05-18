@@ -16,12 +16,15 @@
  * limitations under the License.
  */
 
+#include <atomic>
 #include <cmath>
 #include <fstream>
 #include <memory>
+#include <mutex>
 #include <new>
 #include <numeric>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <napi.h>
@@ -75,6 +78,46 @@ bool extractVector(const Napi::Env& env, const Napi::Value& value, uint32_t dim,
   const float* data = arr.Data();
   out.assign(data, data + dim);
   return true;
+}
+
+// Runs `fn(i)` for every i in [start, end) across `num_threads` worker
+// threads. `num_threads == 0` selects the hardware concurrency. The
+// first exception thrown by any task is re-thrown to the caller once
+// all threads have joined. Modeled on hnswlib's own ParallelFor.
+template <typename Function>
+void parallelFor(size_t start, size_t end, uint32_t num_threads, Function fn) {
+  if (num_threads == 0) num_threads = std::thread::hardware_concurrency();
+  if (num_threads == 0) num_threads = 1;
+  if (num_threads == 1 || end - start <= 1) {
+    for (size_t i = start; i < end; i++) fn(i);
+    return;
+  }
+  // Never spawn more threads than there are work items.
+  if (num_threads > end - start) num_threads = static_cast<uint32_t>(end - start);
+
+  std::vector<std::thread> threads;
+  std::atomic<size_t> cursor(start);
+  std::exception_ptr first_exception = nullptr;
+  std::mutex exception_mutex;
+
+  for (uint32_t t = 0; t < num_threads; t++) {
+    threads.emplace_back([&] {
+      while (true) {
+        const size_t i = cursor.fetch_add(1);
+        if (i >= end) break;
+        try {
+          fn(i);
+        } catch (...) {
+          std::lock_guard<std::mutex> lock(exception_mutex);
+          if (!first_exception) first_exception = std::current_exception();
+          cursor.store(end); // stop the remaining threads
+          break;
+        }
+      }
+    });
+  }
+  for (auto& thread : threads) thread.join();
+  if (first_exception) std::rethrow_exception(first_exception);
 }
 } // namespace
 
@@ -755,6 +798,43 @@ private:
   hnswlib::HierarchicalNSW<float>** index_;
 };
 
+class BatchInsertWorker : public Napi::AsyncWorker {
+public:
+  BatchInsertWorker(std::vector<std::vector<float>>&& points, std::vector<hnswlib::labeltype>&& labels,
+                    hnswlib::HierarchicalNSW<float>** index, uint32_t num_threads, bool replace_deleted,
+                    Napi::Promise::Deferred deferred, Napi::Function& callback)
+      : Napi::AsyncWorker(callback), deferred(deferred), points_(std::move(points)), labels_(std::move(labels)),
+        index_(index), num_threads_(num_threads), replace_deleted_(replace_deleted) {}
+
+  ~BatchInsertWorker() {}
+
+  void Execute() {
+    try {
+      parallelFor(0, points_.size(), num_threads_, [&](size_t i) {
+        (*index_)->addPoint(reinterpret_cast<void*>(points_[i].data()), labels_[i], replace_deleted_);
+      });
+    } catch (const std::exception& e) {
+      SetError("Hnswlib Error: " + std::string(e.what()));
+    }
+  }
+
+  void OnOK() {
+    Napi::HandleScope scope(Env());
+    deferred.Resolve(Env().Undefined());
+  }
+
+  void OnError(const Napi::Error& e) { deferred.Reject(e.Value()); }
+
+  Napi::Promise::Deferred deferred;
+
+private:
+  std::vector<std::vector<float>> points_;
+  std::vector<hnswlib::labeltype> labels_;
+  hnswlib::HierarchicalNSW<float>** index_;
+  uint32_t num_threads_;
+  bool replace_deleted_;
+};
+
 class HierarchicalNSW : public Napi::ObjectWrap<HierarchicalNSW> {
 public:
   uint32_t dim_;
@@ -818,6 +898,7 @@ public:
       InstanceMethod("writeIndexSync", &HierarchicalNSW::writeIndexSync),
       InstanceMethod("resizeIndex", &HierarchicalNSW::resizeIndex),
       InstanceMethod("addPoint", &HierarchicalNSW::addPoint),
+      InstanceMethod("addPoints", &HierarchicalNSW::addPoints),
       InstanceMethod("markDelete", &HierarchicalNSW::markDelete),
       InstanceMethod("unmarkDelete", &HierarchicalNSW::unmarkDelete),
       InstanceMethod("searchKnn", &HierarchicalNSW::searchKnn),
@@ -1129,6 +1210,103 @@ private:
     }
 
     return env.Null();
+  }
+
+  Napi::Value addPoints(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    if (info.Length() < 2) {
+      Napi::Error::New(env, "Expected 2-3 arguments, but got " + std::to_string(info.Length()) + ".")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[0].IsArray()) {
+      Napi::TypeError::New(env, "Invalid the first argument type, must be an Array.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[1].IsArray()) {
+      Napi::TypeError::New(env, "Invalid the second argument type, must be an Array.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+    if (!info[2].IsUndefined() && !info[2].IsObject()) {
+      Napi::TypeError::New(env, "Invalid the third argument type, must be an object.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    if (index_ == nullptr) {
+      Napi::Error::New(env, "Search index has not been initialized, call `initIndex` in advance.").ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    uint32_t num_threads = 0;
+    bool replace_deleted = false;
+    if (info[2].IsObject()) {
+      const Napi::Object options = info[2].As<Napi::Object>();
+      if (options.Has("numThreads")) {
+        if (!options.Get("numThreads").IsNumber()) {
+          Napi::TypeError::New(env, "Invalid the option `numThreads`, must be a number.").ThrowAsJavaScriptException();
+          return env.Null();
+        }
+        const double requested = options.Get("numThreads").As<Napi::Number>().DoubleValue();
+        if (!(requested >= 0.0 && requested <= 1024.0)) {
+          Napi::RangeError::New(env, "Invalid the option `numThreads`, must be between 0 and 1024.")
+            .ThrowAsJavaScriptException();
+          return env.Null();
+        }
+        num_threads = static_cast<uint32_t>(requested);
+      }
+      if (options.Has("replaceDeleted")) {
+        if (!options.Get("replaceDeleted").IsBoolean()) {
+          Napi::TypeError::New(env, "Invalid the option `replaceDeleted`, must be a boolean.").ThrowAsJavaScriptException();
+          return env.Null();
+        }
+        replace_deleted = options.Get("replaceDeleted").As<Napi::Boolean>().Value();
+      }
+    }
+
+    const Napi::Array points = info[0].As<Napi::Array>();
+    const Napi::Array labels = info[1].As<Napi::Array>();
+    if (points.Length() != labels.Length()) {
+      Napi::Error::New(env, "The points and labels arrays must have the same length (got " +
+                              std::to_string(points.Length()) + " and " + std::to_string(labels.Length()) + ").")
+        .ThrowAsJavaScriptException();
+      return env.Null();
+    }
+
+    // Extract every point and label into C++ memory on the JS thread:
+    // the async worker that follows runs off-thread and must not touch
+    // N-API values.
+    const uint32_t n = points.Length();
+    std::vector<std::vector<float>> extracted(n);
+    std::vector<hnswlib::labeltype> ids(n);
+    for (uint32_t i = 0; i < n; i++) {
+      const Napi::Value point = points[i];
+      if (!isVectorInput(point)) {
+        Napi::TypeError::New(env, "Invalid element " + std::to_string(i) +
+                                    " of the points array, must be an Array or Float32Array.")
+          .ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      const std::string role = "point at index " + std::to_string(i);
+      if (!extractVector(env, point, dim_, role.c_str(), extracted[i])) return env.Null();
+      if (normalize_) normalizePoint(extracted[i]);
+      const Napi::Value label = labels[i];
+      if (!label.IsNumber()) {
+        Napi::TypeError::New(env, "Invalid element " + std::to_string(i) + " of the labels array, must be a number.")
+          .ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      ids[i] = static_cast<hnswlib::labeltype>(label.As<Napi::Number>().Uint32Value());
+    }
+
+    Napi::Function callback = Napi::Function::New(env, [](const Napi::CallbackInfo& info) { return info.Env().Undefined(); });
+    Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(env);
+    BatchInsertWorker* worker =
+      new BatchInsertWorker(std::move(extracted), std::move(ids), &index_, num_threads, replace_deleted, deferred, callback);
+
+    worker->Queue();
+
+    return worker->deferred.Promise();
   }
 
   Napi::Value markDelete(const Napi::CallbackInfo& info) {

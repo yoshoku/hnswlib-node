@@ -8,6 +8,10 @@
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
       "conditions": [
+        ["OS=='linux'", {
+          "cflags_cc": [ "-pthread" ],
+          "ldflags": [ "-pthread" ]
+        }],
         ["OS=='win'", {
           "defines": [
             "_HAS_EXCEPTIONS=1"
