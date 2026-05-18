@@ -895,7 +895,7 @@ private:
         return env.Null();
       }
       if (named_args.Has("allowReplaceDeleted") && !named_args.Get("allowReplaceDeleted").IsBoolean()) {
-        Napi::TypeError::New(env, "Invalid the named argument type `allowRepalceDeleted`, must be a boolean.")
+        Napi::TypeError::New(env, "Invalid the named argument type `allowReplaceDeleted`, must be a boolean.")
           .ThrowAsJavaScriptException();
         return env.Null();
       }
@@ -905,7 +905,7 @@ private:
         return env.Null();
       }
       if (!info[1].IsUndefined() && !info[1].IsNumber()) {
-        Napi::TypeError::New(env, "Invalid the sencond argument type, must be a number.").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "Invalid the second argument type, must be a number.").ThrowAsJavaScriptException();
         return env.Null();
       }
       if (!info[2].IsUndefined() && !info[2].IsNumber()) {
