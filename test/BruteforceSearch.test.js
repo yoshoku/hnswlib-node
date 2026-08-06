@@ -3,19 +3,27 @@ const { BruteforceSearch } = require('../lib')
 describe('BruteforceSearch', () => {
   describe('#constructor', () => {
     it('throws an error if no arguments are given', () => {
-      expect(() => { new BruteforceSearch() }).toThrow('Expected 2 arguments, but got 0.') // eslint-disable-line no-new
+      expect(() => {
+        new BruteforceSearch()
+      }).toThrow('Expected 2 arguments, but got 0.')
     })
 
     it('throws an error if given a non-String object to first argument', () => {
-      expect(() => { new BruteforceSearch(1, 3) }).toThrow('Invalid the first argument type, must be a string.') // eslint-disable-line no-new
+      expect(() => {
+        new BruteforceSearch(1, 3)
+      }).toThrow('Invalid the first argument type, must be a string.')
     })
 
     it('throws an error if given a non-Number object to second argument', () => {
-      expect(() => { new BruteforceSearch('l2', '3') }).toThrow('Invalid the second argument type, must be a number.') // eslint-disable-line no-new
+      expect(() => {
+        new BruteforceSearch('l2', '3')
+      }).toThrow('Invalid the second argument type, must be a number.')
     })
 
     it('throws an error if given a String that is neither "l2", "ip" nor "cosine" to first argument', () => {
-      expect(() => { new BruteforceSearch('cos', 3) }).toThrow('Wrong space name, expected "l2", "ip", or "cosine".') // eslint-disable-line no-new
+      expect(() => {
+        new BruteforceSearch('cos', 3)
+      }).toThrow('Wrong space name, expected "l2", "ip", or "cosine".')
     })
   })
 
@@ -23,11 +31,15 @@ describe('BruteforceSearch', () => {
     const index = new BruteforceSearch('l2', 3)
 
     it('throws an error if no arguments are given', () => {
-      expect(() => { index.initIndex() }).toThrow('Expected 1 arguments, but got 0.')
+      expect(() => {
+        index.initIndex()
+      }).toThrow('Expected 1 arguments, but got 0.')
     })
 
     it('throws an error if given a non-Number argument', () => {
-      expect(() => { index.initIndex('5') }).toThrow('Invalid the first argument type, must be a number.')
+      expect(() => {
+        index.initIndex('5')
+      }).toThrow('Invalid the first argument type, must be a number.')
     })
   })
 
@@ -71,30 +83,42 @@ describe('BruteforceSearch', () => {
     const index = new BruteforceSearch('l2', 3)
 
     it('throws an error if no arguments are given', () => {
-      expect(() => { index.addPoint() }).toThrow('Expected 2 arguments, but got 0.')
+      expect(() => {
+        index.addPoint()
+      }).toThrow('Expected 2 arguments, but got 0.')
     })
 
     it('throws an error if given a non-Array object to first argument', () => {
-      expect(() => { index.addPoint('[1, 2, 3]', 0) }).toThrow('Invalid the first argument type, must be an Array.')
+      expect(() => {
+        index.addPoint('[1, 2, 3]', 0)
+      }).toThrow('Invalid the first argument type, must be an Array.')
     })
 
     it('throws an error if given a non-Number object to second argument', () => {
-      expect(() => { index.addPoint([1, 2, 3], '0') }).toThrow('Invalid the second argument type, must be a number.')
+      expect(() => {
+        index.addPoint([1, 2, 3], '0')
+      }).toThrow('Invalid the second argument type, must be a number.')
     })
 
     it('throws an error if called before the index is initialized', () => {
-      expect(() => { index.addPoint([1, 2, 3], 0) }).toThrow('Search index has not been initialized, call `initIndex` in advance.')
+      expect(() => {
+        index.addPoint([1, 2, 3], 0)
+      }).toThrow('Search index has not been initialized, call `initIndex` in advance.')
     })
 
     it('throws an error if given an array with a length different from the number of dimensions', () => {
       index.initIndex(1)
-      expect(() => { index.addPoint([1, 2, 3, 4, 5], 0) }).toThrow('Invalid the given array length (expected 3, but got 5).')
+      expect(() => {
+        index.addPoint([1, 2, 3, 4, 5], 0)
+      }).toThrow('Invalid the given array length (expected 3, but got 5).')
     })
 
     it('throws an error if more element is added than the maximum number of elements.', () => {
       index.initIndex(1)
       index.addPoint([1, 2, 3], 0)
-      expect(() => { index.addPoint([1, 2, 3], 1) }).toThrow(/Hnswlib Error/)
+      expect(() => {
+        index.addPoint([1, 2, 3], 1)
+      }).toThrow(/Hnswlib Error/)
     })
   })
 
@@ -102,15 +126,21 @@ describe('BruteforceSearch', () => {
     const index = new BruteforceSearch('l2', 3)
 
     it('throws an error if no arguments are given', () => {
-      expect(() => { index.removePoint() }).toThrow('Expected 1 arguments, but got 0.')
+      expect(() => {
+        index.removePoint()
+      }).toThrow('Expected 1 arguments, but got 0.')
     })
 
     it('throws an error if given a non-Number argument', () => {
-      expect(() => { index.removePoint('0') }).toThrow('Invalid the first argument type, must be a number.')
+      expect(() => {
+        index.removePoint('0')
+      }).toThrow('Invalid the first argument type, must be a number.')
     })
 
     it('throws an error if called before the index is initialized', () => {
-      expect(() => { index.removePoint(0) }).toThrow('Search index has not been initialized, call `initIndex` in advance.')
+      expect(() => {
+        index.removePoint(0)
+      }).toThrow('Search index has not been initialized, call `initIndex` in advance.')
     })
 
     it('removes the element specified by index', () => {
@@ -136,27 +166,39 @@ describe('BruteforceSearch', () => {
       })
 
       it('throws an error if no arguments are given', () => {
-        expect(() => { index.searchKnn() }).toThrow('Expected 2-3 arguments, but got 0.')
+        expect(() => {
+          index.searchKnn()
+        }).toThrow('Expected 2-3 arguments, but got 0.')
       })
 
       it('throws an error if given a non-Array object to first argument', () => {
-        expect(() => { index.searchKnn('[1, 2, 3]', 2) }).toThrow('Invalid the first argument type, must be an Array.')
+        expect(() => {
+          index.searchKnn('[1, 2, 3]', 2)
+        }).toThrow('Invalid the first argument type, must be an Array.')
       })
 
       it('throws an error if given a non-Number object to second argument', () => {
-        expect(() => { index.searchKnn([1, 2, 3], '2') }).toThrow('Invalid the second argument type, must be a number.')
+        expect(() => {
+          index.searchKnn([1, 2, 3], '2')
+        }).toThrow('Invalid the second argument type, must be a number.')
       })
 
       it('throws an error if given a non-Function object to third argument', () => {
-        expect(() => { index.searchKnn([1, 2, 3], 2, 'fnc') }).toThrow('Invalid the third argument type, must be a function.')
+        expect(() => {
+          index.searchKnn([1, 2, 3], 2, 'fnc')
+        }).toThrow('Invalid the third argument type, must be a function.')
       })
 
       it('throws an error if given the number of neighborhoods exceeding the maximum number of elements', () => {
-        expect(() => { index.searchKnn([1, 2, 5], 4) }).toThrow('Invalid the number of k-nearest neighbors (cannot be given a value greater than `maxElements`: 3).')
+        expect(() => {
+          index.searchKnn([1, 2, 5], 4)
+        }).toThrow('Invalid the number of k-nearest neighbors (cannot be given a value greater than `maxElements`: 3).')
       })
 
       it('throws an error if given an array with a length different from the number of dimensions', () => {
-        expect(() => { index.searchKnn([1, 2, 5, 4], 2) }).toThrow('Invalid the given array length (expected 3, but got 4).')
+        expect(() => {
+          index.searchKnn([1, 2, 5, 4], 2)
+        }).toThrow('Invalid the given array length (expected 3, but got 4).')
       })
 
       it('returns search results based on squared Euclidean distance', () => {

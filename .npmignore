@@ -1,7 +1,7 @@
 .npmignore
 .clang-format
-.eslintrc.json
 .gitignore
+biome.json
 .github/
 .husky/
 node_modules/
