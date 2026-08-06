@@ -37,7 +37,7 @@
     "node-gyp": "^13.0.1",
     "tsd": "^0.33.0",
     "typedoc": "^0.28.20",
-    "typescript": "^5.0.4",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.8"
   }
 }
