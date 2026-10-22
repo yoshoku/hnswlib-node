@@ -116,6 +116,15 @@ private:
     for (uint32_t i = 0; i < dim_; i++) {
       Napi::Value val_a = arr_a[i];
       Napi::Value val_b = arr_b[i];
+      if (env.IsExceptionPending()) return env.Null();
+      if (!val_a.IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the first array type, must be an Array of numbers.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (!val_b.IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the second array type, must be an Array of numbers.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
       vec_a[i] = val_a.As<Napi::Number>().FloatValue();
       vec_b[i] = val_b.As<Napi::Number>().FloatValue();
     }
@@ -206,6 +215,15 @@ private:
     for (uint32_t i = 0; i < dim_; i++) {
       Napi::Value val_a = arr_a[i];
       Napi::Value val_b = arr_b[i];
+      if (env.IsExceptionPending()) return env.Null();
+      if (!val_a.IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the first array type, must be an Array of numbers.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
+      if (!val_b.IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the second array type, must be an Array of numbers.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
       vec_a[i] = val_a.As<Napi::Number>().FloatValue();
       vec_b[i] = val_b.As<Napi::Number>().FloatValue();
     }
@@ -222,7 +240,12 @@ class CustomFilterFunctor : public hnswlib::BaseFilterFunctor {
 public:
   CustomFilterFunctor(const Napi::Env& env, const Napi::Function& callback) : env_(env), callback_(callback) {}
 
-  bool operator()(hnswlib::labeltype id) { return callback_.Call({Napi::Number::New(env_, id)}).ToBoolean().Value(); }
+  bool operator()(hnswlib::labeltype id) {
+    if (env_.IsExceptionPending()) return false;
+    const Napi::Value result = callback_.Call({Napi::Number::New(env_, id)});
+    if (env_.IsExceptionPending()) return false;
+    return result.ToBoolean().Value();
+  }
 
 private:
   Napi::Env env_;
@@ -551,6 +574,11 @@ private:
     std::vector<float> vec(dim_, 0.0);
     for (uint32_t i = 0; i < dim_; i++) {
       Napi::Value val = arr[i];
+      if (env.IsExceptionPending()) return env.Null();
+      if (!val.IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the given array type, must be an Array of numbers.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
       vec[i] = val.As<Napi::Number>().FloatValue();
     }
 
@@ -619,16 +647,6 @@ private:
       return env.Null();
     }
 
-    CustomFilterFunctor* filterFn = nullptr;
-    if (info[2].IsFunction()) {
-      try {
-        filterFn = new CustomFilterFunctor(env, info[2].As<Napi::Function>());
-      } catch (const std::bad_alloc& err) {
-        Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
-        return env.Null();
-      }
-    }
-
     Napi::Array arr = info[0].As<Napi::Array>();
     if (arr.Length() != dim_) {
       Napi::Error::New(env, "Invalid the given array length (expected " + std::to_string(dim_) + ", but got " +
@@ -653,13 +671,32 @@ private:
     std::vector<float> vec(dim_, 0.0);
     for (uint32_t i = 0; i < dim_; i++) {
       Napi::Value val = arr[i];
+      if (env.IsExceptionPending()) return env.Null();
+      if (!val.IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the given array type, must be an Array of numbers.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
       vec[i] = val.As<Napi::Number>().FloatValue();
     }
 
     if (normalize_) normalizePoint(vec);
 
+    CustomFilterFunctor* filterFn = nullptr;
+    if (info[2].IsFunction()) {
+      try {
+        filterFn = new CustomFilterFunctor(env, info[2].As<Napi::Function>());
+      } catch (const std::bad_alloc& err) {
+        Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
+        return env.Null();
+      }
+    }
+
     std::priority_queue<std::pair<float, size_t>> knn =
       index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k), filterFn);
+
+    if (filterFn) delete filterFn;
+    if (env.IsExceptionPending()) return env.Null();
+
     const size_t n_results = knn.size();
     Napi::Array arr_distances = Napi::Array::New(env, n_results);
     Napi::Array arr_neighbors = Napi::Array::New(env, n_results);
@@ -669,8 +706,6 @@ private:
       arr_neighbors[i] = Napi::Number::New(env, nn.second);
       knn.pop();
     }
-
-    if (filterFn) delete filterFn;
 
     Napi::Object results = Napi::Object::New(env);
     results.Set("distances", arr_distances);
@@ -870,31 +905,45 @@ private:
     const bool given_named_args = info.Length() == 1 && info[0].IsObject();
     const Napi::Object named_args = given_named_args ? info[0].As<Napi::Object>() : Napi::Object::New(env);
 
+    Napi::Value max_elements_arg;
+    Napi::Value m_arg;
+    Napi::Value ef_construction_arg;
+    Napi::Value random_seed_arg;
+    Napi::Value allow_replace_deleted_arg;
+
     if (given_named_args) {
       if (!named_args.Has("maxElements")) {
         Napi::TypeError::New(env, "Missing named argument `maxElements`, must be specified.").ThrowAsJavaScriptException();
         return env.Null();
       }
-      if (!named_args.Get("maxElements").IsNumber()) {
+
+      max_elements_arg = named_args.Get("maxElements");
+      if (named_args.Has("m")) m_arg = named_args.Get("m");
+      if (named_args.Has("efConstruction")) ef_construction_arg = named_args.Get("efConstruction");
+      if (named_args.Has("randomSeed")) random_seed_arg = named_args.Get("randomSeed");
+      if (named_args.Has("allowReplaceDeleted")) allow_replace_deleted_arg = named_args.Get("allowReplaceDeleted");
+      if (env.IsExceptionPending()) return env.Null();
+
+      if (!max_elements_arg.IsNumber()) {
         Napi::TypeError::New(env, "Invalid the named argument type `maxElements`, must be a number.")
           .ThrowAsJavaScriptException();
         return env.Null();
       }
-      if (named_args.Has("m") && !named_args.Get("m").IsNumber()) {
+      if (!m_arg.IsEmpty() && !m_arg.IsNumber()) {
         Napi::TypeError::New(env, "Invalid the named argument type `m`, must be a number.").ThrowAsJavaScriptException();
         return env.Null();
       }
-      if (named_args.Has("efConstruction") && !named_args.Get("efConstruction").IsNumber()) {
+      if (!ef_construction_arg.IsEmpty() && !ef_construction_arg.IsNumber()) {
         Napi::TypeError::New(env, "Invalid the named argument type `efConstruction`, must be a number.")
           .ThrowAsJavaScriptException();
         return env.Null();
       }
-      if (named_args.Has("randomSeed") && !named_args.Get("randomSeed").IsNumber()) {
+      if (!random_seed_arg.IsEmpty() && !random_seed_arg.IsNumber()) {
         Napi::TypeError::New(env, "Invalid the named argument type `randomSeed`, must be a number.")
           .ThrowAsJavaScriptException();
         return env.Null();
       }
-      if (named_args.Has("allowReplaceDeleted") && !named_args.Get("allowReplaceDeleted").IsBoolean()) {
+      if (!allow_replace_deleted_arg.IsEmpty() && !allow_replace_deleted_arg.IsBoolean()) {
         Napi::TypeError::New(env, "Invalid the named argument type `allowRepalceDeleted`, must be a boolean.")
           .ThrowAsJavaScriptException();
         return env.Null();
@@ -920,23 +969,21 @@ private:
         Napi::TypeError::New(env, "Invalid the fifth argument type, must be a boolean.").ThrowAsJavaScriptException();
         return env.Null();
       }
+
+      max_elements_arg = info[0];
+      if (!info[1].IsUndefined()) m_arg = info[1];
+      if (!info[2].IsUndefined()) ef_construction_arg = info[2];
+      if (!info[3].IsUndefined()) random_seed_arg = info[3];
+      if (!info[4].IsUndefined()) allow_replace_deleted_arg = info[4];
     }
 
-    const uint32_t max_elements_ = given_named_args ? named_args.Get("maxElements").As<Napi::Number>().Uint32Value()
-                                                    : info[0].As<Napi::Number>().Uint32Value();
-    const uint32_t m_ = given_named_args ? (!named_args.Has("m") ? 16 : named_args.Get("m").As<Napi::Number>().Uint32Value())
-                                         : (info[1].IsUndefined() ? 16 : info[1].As<Napi::Number>().Uint32Value());
+    const uint32_t max_elements_ = max_elements_arg.As<Napi::Number>().Uint32Value();
+    const uint32_t m_ = m_arg.IsEmpty() ? 16 : m_arg.As<Napi::Number>().Uint32Value();
     const uint32_t ef_construction_ =
-      given_named_args
-        ? (!named_args.Has("efConstruction") ? 200 : named_args.Get("efConstruction").As<Napi::Number>().Uint32Value())
-        : (info[2].IsUndefined() ? 200 : info[2].As<Napi::Number>().Uint32Value());
-    const uint32_t random_seed_ =
-      given_named_args ? (!named_args.Has("randomSeed") ? 100 : named_args.Get("randomSeed").As<Napi::Number>().Uint32Value())
-                       : (info[3].IsUndefined() ? 100 : info[3].As<Napi::Number>().Uint32Value());
+      ef_construction_arg.IsEmpty() ? 200 : ef_construction_arg.As<Napi::Number>().Uint32Value();
+    const uint32_t random_seed_ = random_seed_arg.IsEmpty() ? 100 : random_seed_arg.As<Napi::Number>().Uint32Value();
     const bool allow_replace_deleted_ =
-      given_named_args
-        ? (!named_args.Has("allowReplaceDeleted") ? false : named_args.Get("allowReplaceDeleted").As<Napi::Boolean>().Value())
-        : (info[4].IsUndefined() ? false : info[4].As<Napi::Boolean>().Value());
+      allow_replace_deleted_arg.IsEmpty() ? false : allow_replace_deleted_arg.As<Napi::Boolean>().Value();
 
     if (index_) delete index_;
 
@@ -1141,6 +1188,11 @@ private:
     std::vector<float> vec(dim_, 0.0);
     for (uint32_t i = 0; i < dim_; i++) {
       Napi::Value val = arr[i];
+      if (env.IsExceptionPending()) return env.Null();
+      if (!val.IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the given array type, must be an Array of numbers.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
       vec[i] = val.As<Napi::Number>().FloatValue();
     }
 
@@ -1253,16 +1305,6 @@ private:
       return env.Null();
     }
 
-    CustomFilterFunctor* filterFn = nullptr;
-    if (info[2].IsFunction()) {
-      try {
-        filterFn = new CustomFilterFunctor(env, info[2].As<Napi::Function>());
-      } catch (const std::bad_alloc& err) {
-        Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
-        return env.Null();
-      }
-    }
-
     const uint32_t k = info[1].As<Napi::Number>().Uint32Value();
     if (k > index_->max_elements_) {
       Napi::Error::New(env, "Invalid the number of k-nearest neighbors (cannot be given a value greater than `maxElements`: " +
@@ -1274,13 +1316,32 @@ private:
     std::vector<float> vec(dim_, 0.0);
     for (uint32_t i = 0; i < dim_; i++) {
       Napi::Value val = arr[i];
+      if (env.IsExceptionPending()) return env.Null();
+      if (!val.IsNumber()) {
+        Napi::TypeError::New(env, "Invalid the given array type, must be an Array of numbers.").ThrowAsJavaScriptException();
+        return env.Null();
+      }
       vec[i] = val.As<Napi::Number>().FloatValue();
     }
 
     if (normalize_) normalizePoint(vec);
 
+    CustomFilterFunctor* filterFn = nullptr;
+    if (info[2].IsFunction()) {
+      try {
+        filterFn = new CustomFilterFunctor(env, info[2].As<Napi::Function>());
+      } catch (const std::bad_alloc& err) {
+        Napi::Error::New(env, err.what()).ThrowAsJavaScriptException();
+        return env.Null();
+      }
+    }
+
     std::priority_queue<std::pair<float, size_t>> knn =
       index_->searchKnn(reinterpret_cast<void*>(vec.data()), static_cast<size_t>(k), filterFn);
+
+    if (filterFn) delete filterFn;
+    if (env.IsExceptionPending()) return env.Null();
+
     const size_t n_results = knn.size();
     Napi::Array arr_distances = Napi::Array::New(env, n_results);
     Napi::Array arr_neighbors = Napi::Array::New(env, n_results);
@@ -1290,8 +1351,6 @@ private:
       arr_neighbors[i] = Napi::Number::New(env, nn.second);
       knn.pop();
     }
-
-    if (filterFn) delete filterFn;
 
     Napi::Object results = Napi::Object::New(env);
     results.Set("distances", arr_distances);
